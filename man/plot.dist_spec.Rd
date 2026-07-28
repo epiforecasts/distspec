@@ -36,6 +36,7 @@ and no \code{cdf_cutoff} of its own raises an error; bound it first (e.g. with
 \code{\link[=bound_dist]{bound_dist()}}).
 }
 \examples{
+\dontshow{if (rlang::is_installed("ggplot2")) withAutoprint(\{ # examplesIf}
 # A fixed lognormal distribution with mean 5 and sd 1.
 dist1 <- LogNormal(mean = 1.6, sd = 0.5, max = 20)
 # Plot discretised distribution with 1 day discretisation window
@@ -55,4 +56,5 @@ plot(dist2)
 # Multiple distributions with 0.1 discretisation window and do not plot the
 # cumulative distribution
 plot(dist1 + dist2, res = 0.1, cumulative = FALSE)
+\dontshow{\}) # examplesIf}
 }
