@@ -28,7 +28,10 @@ jobs:
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::rmarkdown, any::allcontributors, local::.
+          # allcontributors from GitHub until the pandoc blank-line fix
+          # (ropensci/allcontributors#65) reaches CRAN; the released version
+          # reformats the contributors block and churns the README diff
+          packages: any::rmarkdown, ropensci/allcontributors, local::.
 
       - name: Update contributors
         if: github.ref == 'refs/heads/main'
