@@ -4,7 +4,7 @@
 \name{distspec-package}
 \alias{distspec}
 \alias{distspec-package}
-\title{distspec: Define Probability Distributions with Certain or Uncertain Parameters}
+\title{distspec: Probability Distributions with Certain or Uncertain Parameters}
 \description{
 Represents probability distributions with fixed or potentially uncertain parameters, with tools to discretise, convolve, sample from and summarise them.
 }
@@ -23,6 +23,11 @@ Authors:
 \itemize{
   \item James M. Azam \email{james.azam@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-5782-7330}{ORCID})
   \item Sam Abbott \email{sam.abbott@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-8057-8037}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item EpiForecasts [copyright holder]
 }
 
 }

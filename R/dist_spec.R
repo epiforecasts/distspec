@@ -672,22 +672,6 @@ plot.dist_spec <- function(x, samples = 50L, res = 1, cumulative = TRUE, ...) {
 #' @importFrom cli cli_abort
 #' @return A single `dist_spec` object
 #' @keywords internal
-#' @examples
-#' dist1 <- LogNormal(mean = 1.6, sd = 0.5, max = 20)
-#'
-#' # An uncertain gamma distribution with shape and rate normally distributed
-#' # as Normal(3, 0.5) and Normal(2, 0.5) respectively
-#' dist2 <- Gamma(
-#'   shape = Normal(3, 0.5),
-#'   rate = Normal(2, 0.5),
-#'   max = 20
-#' )
-#'
-#' # Multiple distributions
-#' \dontrun{
-#' dist <- dist1 + dist2
-#' extract_single_dist(dist, 2)
-#' }
 extract_single_dist <- function(x, i) {
   if (i > ndist(x)) {
     cli_abort(
