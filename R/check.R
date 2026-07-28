@@ -33,8 +33,7 @@ check_sparse_pmf_tail <- function(pmf, span = 5, tol = 1e-6) {
 #' only finite, non-negative values, and not be all zero, so that it can be
 #' normalised to sum to one. Raises an informative error otherwise. An
 #' un-normalised vector is allowed (it is treated as weights and normalised by
-#' the caller) but warns, since a vector that was meant to be a probability mass
-#' function but does not sum to one is usually a mistake.
+#' the caller) but warns.
 #'
 #' @param x A numeric vector.
 #' @param arg The name of the calling argument, used in the messages.
