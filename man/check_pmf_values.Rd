@@ -9,7 +9,7 @@ check_pmf_values(x, arg = "pmf")
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{arg}{The name of the calling argument, used in the error messages.}
+\item{arg}{The name of the calling argument, used in the messages.}
 }
 \value{
 \code{x}, invisibly, if it is valid; otherwise an error is raised.
@@ -17,7 +17,9 @@ check_pmf_values(x, arg = "pmf")
 \description{
 A numeric probability mass function or weight vector must be numeric, contain
 only finite, non-negative values, and not be all zero, so that it can be
-normalised to sum to one. Raises an informative error otherwise. Un-normalised
-vectors are allowed: they are treated as weights and normalised by the caller.
+normalised to sum to one. Raises an informative error otherwise. An
+un-normalised vector is allowed (it is treated as weights and normalised by
+the caller) but warns, since a vector that was meant to be a probability mass
+function but does not sum to one is usually a mistake.
 }
 \keyword{internal}

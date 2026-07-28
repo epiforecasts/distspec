@@ -17,12 +17,19 @@ test_that("Dirichlet works with prior and concentration", {
   expect_equal(mean(result), prior / sum(prior))
 })
 
-test_that("Dirichlet rejects a bad numeric prior", {
+test_that("Dirichlet rejects a bad numeric prior and warns on an un-normalised one", {
   expect_error(Dirichlet(prior = c(0.5, -0.1, 0.6), concentration = 10),
     "negative"
   )
   expect_error(Dirichlet(prior = c(0.5, NA, 0.5), concentration = 10), "finite")
   expect_error(Dirichlet(prior = c(0, 0, 0), concentration = 10), "all zero")
+  ## an un-normalised prior is normalised, but warns
+  expect_warning(
+    Dirichlet(prior = c(1, 2, 1), concentration = 10), "does not sum to 1"
+  )
+  expect_no_warning(
+    Dirichlet(prior = c(0.25, 0.5, 0.25), concentration = 10)
+  )
 })
 
 test_that("Dirichlet works with dist_spec prior", {

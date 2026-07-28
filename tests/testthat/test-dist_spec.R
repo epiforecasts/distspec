@@ -490,11 +490,11 @@ test_that("get functions report errors", {
   )
   expect_error(get_pmf(Gamma(mean = 4, sd = 1)), "parametric")
   expect_error(
-    get_parameters(NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))),
+    get_parameters(NonParametric(c(0.1, 0.3, 0.2, 0.4))),
     "nonparametric"
   )
   expect_error(
-    get_parameters(NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))),
+    get_parameters(NonParametric(c(0.1, 0.3, 0.2, 0.4))),
     "get_pmf"
   )
   expect_error(get_parameters(c(
