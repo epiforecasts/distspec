@@ -31,12 +31,12 @@ check_sparse_pmf_tail <- function(pmf, span = 5, tol = 1e-6) {
 #' @description
 #' A numeric probability mass function or weight vector must be numeric, contain
 #' only finite, non-negative values, and not be all zero, so that it can be
-#' normalised to sum to one. Raises an informative error otherwise.
-#' Un-normalised vectors are allowed: they are treated as weights and normalised
-#' by the caller.
+#' normalised to sum to one. Raises an informative error otherwise. An
+#' un-normalised vector is allowed (it is treated as weights and normalised by
+#' the caller) but warns.
 #'
 #' @param x A numeric vector.
-#' @param arg The name of the calling argument, used in the error messages.
+#' @param arg The name of the calling argument, used in the messages.
 #' @return `x`, invisibly, if it is valid; otherwise an error is raised.
 #' @importFrom cli cli_abort
 #' @keywords internal
@@ -50,10 +50,19 @@ check_pmf_values <- function(x, arg = "pmf") {
   if (any(x < 0)) {
     cli_abort("{.arg {arg}} must not contain negative values.")
   }
-  if (all(x == 0)) {
+  total <- sum(x)
+  if (total == 0) {
     cli_abort(
       "{.arg {arg}} must not be all zero; it cannot be normalised to a
       probability mass function."
+    )
+  }
+  if (!isTRUE(all.equal(total, 1))) {
+    cli_warn(
+      c(
+        "!" = "{.arg {arg}} does not sum to 1 (it sums to {.val {total}}).",
+        "i" = "It has been normalised to a probability mass function."
+      )
     )
   }
   invisible(x)

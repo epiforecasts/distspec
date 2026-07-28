@@ -4,18 +4,26 @@ test_that("a nonparametric distribution normalises its PMF", {
     c(0.1, 0.3, 0.2, 0.4)
   )
   expect_equal(
-    round(get_pmf(NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))), 2),
+    round(get_pmf(suppressWarnings(
+      NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))
+    )), 2),
     c(0.12, 0.37, 0.25, 0.12, 0.12)
   )
   expect_equal(
-    get_distribution(NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))),
+    get_distribution(suppressWarnings(
+      NonParametric(c(0.1, 0.3, 0.2, 0.1, 0.1))
+    )),
     "nonparametric"
   )
 })
 
-test_that("NonParametric accepts un-normalised weights but rejects bad values", {
-  ## un-normalised weights are treated as such and normalised
-  expect_equal(get_pmf(NonParametric(c(1, 2, 1))), c(0.25, 0.5, 0.25))
+test_that("NonParametric warns on un-normalised weights and rejects bad values", {
+  ## un-normalised weights are normalised, but warn since a PMF that does not
+  ## sum to 1 is usually a mistake
+  expect_warning(result <- NonParametric(c(1, 2, 1)), "does not sum to 1")
+  expect_equal(get_pmf(result), c(0.25, 0.5, 0.25))
+  ## a PMF that already sums to 1 does not warn
+  expect_no_warning(NonParametric(c(0.25, 0.5, 0.25)))
   ## genuinely invalid input errors rather than silently normalising
   expect_error(NonParametric(c(0.5, -0.1, 0.6)), "negative")
   expect_error(NonParametric(c(0.5, NA, 0.5)), "finite")
