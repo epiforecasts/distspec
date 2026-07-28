@@ -457,6 +457,7 @@ max.multi_dist_spec <- function(x, ...) {
 #' print(dist2)
 print.dist_spec <- function(x, ...) {
   print_dist_spec_indented(x, indent = 0, ...)
+  invisible(x)
 }
 #' @keywords internal
 print_dist_spec_indented <- function(x, indent, ...) {
@@ -553,7 +554,7 @@ print_dist_spec_indented <- function(x, indent, ...) {
 #' @importFrom rlang .data `%||%`
 #' @importFrom cli cli_abort cli_warn
 #' @export
-#' @examples
+#' @examplesIf rlang::is_installed("ggplot2")
 #' # A fixed lognormal distribution with mean 5 and sd 1.
 #' dist1 <- LogNormal(mean = 1.6, sd = 0.5, max = 20)
 #' # Plot discretised distribution with 1 day discretisation window
@@ -672,22 +673,6 @@ plot.dist_spec <- function(x, samples = 50L, res = 1, cumulative = TRUE, ...) {
 #' @importFrom cli cli_abort
 #' @return A single `dist_spec` object
 #' @keywords internal
-#' @examples
-#' dist1 <- LogNormal(mean = 1.6, sd = 0.5, max = 20)
-#'
-#' # An uncertain gamma distribution with shape and rate normally distributed
-#' # as Normal(3, 0.5) and Normal(2, 0.5) respectively
-#' dist2 <- Gamma(
-#'   shape = Normal(3, 0.5),
-#'   rate = Normal(2, 0.5),
-#'   max = 20
-#' )
-#'
-#' # Multiple distributions
-#' \dontrun{
-#' dist <- dist1 + dist2
-#' extract_single_dist(dist, 2)
-#' }
 extract_single_dist <- function(x, i) {
   if (i > ndist(x)) {
     cli_abort(

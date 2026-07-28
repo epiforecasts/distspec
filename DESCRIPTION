@@ -1,6 +1,6 @@
 Type: Package
 Package: distspec
-Title: Define Probability Distributions with Certain or Uncertain Parameters
+Title: Probability Distributions with Certain or Uncertain Parameters
 Version: 0.1.0
 Authors@R: 
     c(person(given = "Sebastian",

@@ -4,7 +4,7 @@
 \name{distspec-package}
 \alias{distspec}
 \alias{distspec-package}
-\title{distspec: Define Probability Distributions with Certain or Uncertain Parameters}
+\title{distspec: Probability Distributions with Certain or Uncertain Parameters}
 \description{
 Represents probability distributions with fixed or potentially uncertain parameters, with tools to discretise, convolve, sample from and summarise them.
 }
