@@ -32,7 +32,7 @@ NonParametric <- function(pmf, ...) {
     pmf <- pmf / sum(pmf)
   }
   params <- list(pmf = pmf)
-  new_dist_spec(params, "nonparametric", ...)
+  new_dist_spec(params, "nonparametric", ..., user_env = caller_env())
 }
 
 #' @method mean nonparametric

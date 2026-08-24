@@ -65,6 +65,10 @@ extract_params <- function(params, distribution) {
 #' @param distribution Character; the distribution type (e.g. `"gamma"`,
 #'   `"lognormal"`, `"nonparametric"`).
 #' @inheritParams bound_dist
+#' @param user_env The environment in which the deprecated `cdf_cutoff`
+#'   argument was supplied, used to attribute its deprecation warning to the
+#'   calling code. The distribution constructors pass their caller's
+#'   environment through; other callers can normally leave the default.
 #' @importFrom cli cli_abort cli_warn
 #' @importFrom lifecycle deprecated is_present
 #' @importFrom rlang caller_env
@@ -76,11 +80,10 @@ extract_params <- function(params, distribution) {
 #'   distribution = "normal"
 #' )
 new_dist_spec <- function(params, distribution, max = Inf, cdf_max = 1,
-                          cdf_cutoff = deprecated()) {
+                          cdf_cutoff = deprecated(),
+                          user_env = caller_env()) {
   if (is_present(cdf_cutoff)) {
-    ## the user's frame is two levels up: the constructors (`Gamma()` etc.)
-    ## forward their `...` here, so `caller_env()` would be the constructor
-    warn_cdf_cutoff_deprecated("new_dist_spec", user_env = caller_env(2))
+    warn_cdf_cutoff_deprecated("new_dist_spec", user_env = user_env)
     cdf_max <- cdf_cutoff
   }
   if (distribution == "nonparametric") {

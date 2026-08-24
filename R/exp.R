@@ -19,7 +19,7 @@
 #' Exponential(mean = 4)
 Exponential <- function(rate, mean, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "exp", ...)
+  new_dist_spec(params, "exp", ..., user_env = caller_env())
 }
 
 #' @rdname Exponential
