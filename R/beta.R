@@ -21,7 +21,7 @@
 #' Beta(mean = 0.3, sd = 0.15)
 Beta <- function(shape1, shape2, mean, sd, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "beta", ..., user_env = caller_env())
+  new_dist_spec(params, "beta", ...)
 }
 
 #' @exportS3Method

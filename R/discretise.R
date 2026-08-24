@@ -244,7 +244,7 @@ discretize <- discretise
 #' bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
   if (is_present(cdf_cutoff)) {
-    warn_cdf_cutoff_deprecated("bound_dist", user_env = caller_env())
+    warn_cdf_cutoff_deprecated("bound_dist")
     cdf_max <- cdf_cutoff
   }
   if (!is(x, "dist_spec")) {
@@ -315,10 +315,21 @@ bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
 # interpreted as `cdf_max` (the CDF level to keep, the distspec 0.1.0
 # convention). A value in the historical EpiNow2 convention (the tail
 # probability to drop) is below 0.5 and so lands in the guard error, which
-# points to the `1 - x` conversion. `user_env` must be the frame of the user
-# code that supplied `cdf_cutoff`, so lifecycle attributes the deprecated
-# usage (and its warning frequency) to the caller rather than to distspec.
-warn_cdf_cutoff_deprecated <- function(fn, user_env) {
+# points to the `1 - x` conversion.
+#
+# The warning is attributed to the first frame on the call stack outside the
+# distspec namespace: `cdf_cutoff` may arrive via a constructor (user code ->
+# `Gamma()` -> `new_dist_spec()`), so the immediate caller is not necessarily
+# user code, and lifecycle's default attribution would blame distspec itself
+# (and throttle the warning accordingly).
+warn_cdf_cutoff_deprecated <- function(fn) {
+  ns <- topenv(environment())
+  n <- 2
+  user_env <- caller_env(n)
+  while (identical(topenv(user_env), ns) && n < 10) {
+    n <- n + 1
+    user_env <- tryCatch(caller_env(n), error = function(e) globalenv())
+  }
   deprecate_warn(
     "0.2.0",
     paste0(fn, "(cdf_cutoff)"),

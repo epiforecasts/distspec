@@ -25,7 +25,7 @@
 #' Gamma(shape = Normal(16, 2), rate = Normal(4, 1))
 Gamma <- function(shape, rate, scale, mean, sd, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "gamma", ..., user_env = caller_env())
+  new_dist_spec(params, "gamma", ...)
 }
 
 #' @exportS3Method

@@ -22,7 +22,7 @@
 #' LogNormal(meanlog = Normal(1.5, 0.5), sdlog = 0.25, max = 10)
 LogNormal <- function(meanlog, sdlog, mean, sd, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "lognormal", ..., user_env = caller_env())
+  new_dist_spec(params, "lognormal", ...)
 }
 
 #' @exportS3Method

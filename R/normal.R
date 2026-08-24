@@ -18,7 +18,7 @@
 #' Normal(mean = 4, sd = 1, max = 10)
 Normal <- function(mean, sd, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "normal", ..., user_env = caller_env())
+  new_dist_spec(params, "normal", ...)
 }
 
 #' @exportS3Method

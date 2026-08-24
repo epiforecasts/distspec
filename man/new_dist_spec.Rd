@@ -10,8 +10,7 @@ new_dist_spec(
   distribution,
   max = Inf,
   cdf_max = 1,
-  cdf_cutoff = deprecated(),
-  user_env = caller_env()
+  cdf_cutoff = deprecated()
 )
 }
 \arguments{
@@ -35,11 +34,6 @@ and the value is interpreted as \code{cdf_max}, i.e. the CDF level to keep (the
 distspec 0.1.0 convention). A value in the historical EpiNow2 convention
 (the tail probability to drop) is caught by the guard against values below
 \code{0.5}; pass \code{cdf_max = 1 - cdf_cutoff} instead.}
-
-\item{user_env}{The environment in which the deprecated \code{cdf_cutoff}
-argument was supplied, used to attribute its deprecation warning to the
-calling code. The distribution constructors pass their caller's
-environment through; other callers can normally leave the default.}
 }
 \value{
 A \code{dist_spec} of the given specification.

@@ -21,7 +21,7 @@
 #' Weibull(mean = 4, sd = 1)
 Weibull <- function(shape, scale, mean, sd, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "weibull", ..., user_env = caller_env())
+  new_dist_spec(params, "weibull", ...)
 }
 
 #' @exportS3Method
