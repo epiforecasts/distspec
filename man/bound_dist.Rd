@@ -4,7 +4,7 @@
 \alias{bound_dist}
 \title{Define bounds of a \verb{<dist_spec>}}
 \usage{
-bound_dist(x, max = Inf, cdf_cutoff = 1)
+bound_dist(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated())
 }
 \arguments{
 \item{x}{A \verb{<dist_spec>}.}
@@ -12,27 +12,33 @@ bound_dist(x, max = Inf, cdf_cutoff = 1)
 \item{max}{Numeric, maximum value of the distribution. The distribution will
 be truncated at this value. Default: \code{Inf}, i.e. no maximum.}
 
-\item{cdf_cutoff}{Numeric in \verb{(0, 1]}; the cumulative probability up to which
-the distribution is kept, i.e. it is truncated at the \code{cdf_cutoff} quantile.
-For example \code{cdf_cutoff = 0.999} keeps the distribution up to its 99.9th
+\item{cdf_max}{Numeric in \verb{(0, 1]}; the cumulative probability up to which
+the distribution is kept, i.e. it is truncated at the \code{cdf_max} quantile.
+For example \code{cdf_max = 0.999} keeps the distribution up to its 99.9th
 percentile. Default: \code{1}, i.e. keep the full distribution. A value below
 \code{0.5} is rejected, as it is almost certainly the tail probability to \emph{drop}
 rather than the CDF level to keep (use \code{1 - x} instead).}
+
+\item{cdf_cutoff}{[Deprecated] Renamed to \code{cdf_max}. Supplying it warns
+and the value is interpreted as \code{cdf_max}, i.e. the CDF level to keep (the
+distspec 0.1.0 convention). A value in the historical EpiNow2 convention
+(the tail probability to drop) is caught by the guard against values below
+\code{0.5}; pass \code{cdf_max = 1 - cdf_cutoff} instead.}
 }
 \value{
 a \verb{<dist_spec>} with relevant attributes set that define its bounds
 }
 \description{
 Set the bounds that constrain a distribution when it is discretised: \code{max}
-truncates the support at that value, while \code{cdf_cutoff} trims the tail by
-keeping the distribution only up to its \code{cdf_cutoff} quantile. Either bound
+truncates the support at that value, while \code{cdf_max} trims the tail by
+keeping the distribution only up to its \code{cdf_max} quantile. Either bound
 drops the mass beyond it and renormalises the remaining PMF to sum to one.
 }
 \examples{
 # Truncate a gamma distribution at 20
 bound_dist(Gamma(mean = 5, sd = 1), max = 20)
 # Keep it up to its 99.9th percentile
-bound_dist(Gamma(mean = 5, sd = 1), cdf_cutoff = 0.999)
+bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 }
 \seealso{
 \code{\link[=discretise]{discretise()}}, which applies these bounds when producing a PMF.

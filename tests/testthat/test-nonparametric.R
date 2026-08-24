@@ -66,10 +66,10 @@ test_that("fix_parameters resolves an uncertain nonparametric distribution", {
 })
 
 test_that("bounding an uncertain nonparametric distribution errors", {
-  ## `max`/`cdf_cutoff` have no effect on an uncertain distribution, so they are
+  ## `max`/`cdf_max` have no effect on an uncertain distribution, so they are
   ## rejected rather than silently ignored
   expect_error(
-    NonParametric(pmf = Dirichlet(c(0, 2, 4)), cdf_cutoff = 0.9),
+    NonParametric(pmf = Dirichlet(c(0, 2, 4)), cdf_max = 0.9),
     "uncertain nonparametric"
   )
   expect_error(
@@ -109,10 +109,10 @@ test_that("NonParametric applies max at construction", {
   )
 })
 
-test_that("bound_dist combines cdf_cutoff and max on a nonparametric PMF", {
+test_that("bound_dist combines cdf_max and max on a nonparametric PMF", {
   np <- NonParametric(c(0.1, 0.3, 0.4, 0.2))
-  ## `cdf_cutoff` is applied to the tail before `max` truncates and renormalises
-  bounded <- bound_dist(np, max = 2, cdf_cutoff = 0.95)
+  ## `cdf_max` is applied to the tail before `max` truncates and renormalises
+  bounded <- bound_dist(np, max = 2, cdf_max = 0.95)
   expect_equal(get_pmf(bounded), c(0.125, 0.375, 0.5))
   expect_equal(sum(get_pmf(bounded)), 1)
 })

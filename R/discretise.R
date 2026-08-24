@@ -1,5 +1,5 @@
 # Discretisation of distributions: computing discretised PMFs from a
-# <dist_spec> and setting the bounds (max / cdf_cutoff) that constrain them.
+# <dist_spec> and setting the bounds (max / cdf_max) that constrain them.
 
 #' Discretised probability mass function
 #'
@@ -23,9 +23,9 @@
 #'   (probability mass of integer 2), etc.
 #'
 #' The maximum value truncates the distribution: mass beyond it is dropped and
-#' the remaining PMF is renormalised to sum to one. A `cdf_cutoff` below `1`
+#' the remaining PMF is renormalised to sum to one. A `cdf_max` below `1`
 #' additionally trims the tail, keeping the distribution only up to its
-#' `cdf_cutoff` quantile.
+#' `cdf_max` quantile.
 #'
 #' ## Fixed distributions
 #'
@@ -52,7 +52,7 @@
 #'   while `"fixed"` is handled as a point mass by its own method.
 #'
 #' @param ... Additional arguments passed to methods. The default method takes
-#'   `max_value` (the maximum value to allow), `cdf_cutoff` and `width` (the
+#'   `max_value` (the maximum value to allow), `cdf_max` and `width` (the
 #'   width of each discrete bin).
 #'
 #' @return A vector representing a probability distribution.
@@ -64,7 +64,7 @@ discrete_pmf <- function(x, ...) {
 }
 
 #' @exportS3Method
-discrete_pmf.dist_spec <- function(x, max_value, cdf_cutoff, width, ...) {
+discrete_pmf.dist_spec <- function(x, max_value, cdf_max, width, ...) {
   params <- get_parameters(x)
 
   ## CDF function for the distribution type (a type without a `dist_cdf()`
@@ -72,23 +72,23 @@ discrete_pmf.dist_spec <- function(x, max_value, cdf_cutoff, width, ...) {
   ## method entirely)
   cdf <- dist_cdf(x)
 
-  ## truncate at the `cdf_cutoff` quantile if one is set (1 = keep everything)
-  if (!missing(cdf_cutoff) && cdf_cutoff < 1) {
+  ## truncate at the `cdf_max` quantile if one is set (1 = keep everything)
+  if (!missing(cdf_max) && cdf_max < 1) {
     ## max value from the cutoff using the primarycensored quantile function
-    cdf_cutoff_max <- do.call(
+    cdf_max_value <- do.call(
       primarycensored::qprimarycensored,
       c(
         list(
-          p = cdf_cutoff,
+          p = cdf_max,
           pdist = cdf,
           pwindow = width
         ),
         params
       )
     )
-    if (!is.na(cdf_cutoff_max) &&
-          (missing(max_value) || cdf_cutoff_max < max_value)) {
-      max_value <- cdf_cutoff_max
+    if (!is.na(cdf_max_value) &&
+          (missing(max_value) || cdf_max_value < max_value)) {
+      max_value <- cdf_max_value
     }
   }
 
@@ -170,16 +170,16 @@ discretise.dist_spec <- function(x, strict = TRUE, remove_trailing_zeros = TRUE,
     return(x)
   }
   if (!is.na(sd(x)) && is_constrained(x)) {
-    cdf_cutoff <- attr(x, "cdf_cutoff") %||% 1
+    cdf_max <- attr(x, "cdf_max") %||% 1
     dist_max <- attr(x, "max") %||% Inf
     y <- new_single_dist_spec(
       list(
-        pmf = discrete_pmf(x, dist_max, cdf_cutoff, width = 1)
+        pmf = discrete_pmf(x, dist_max, cdf_max, width = 1)
       ),
       "nonparametric"
     )
     preserve_attributes <- setdiff(
-      names(attributes(x)), c("cdf_cutoff", "max", "names", "class")
+      names(attributes(x)), c("cdf_max", "max", "names", "class")
     )
     attributes(y)[preserve_attributes] <- attributes(x)[preserve_attributes]
     if (remove_trailing_zeros) {
@@ -214,20 +214,26 @@ discretize <- discretise
 #'
 #' @description
 #' Set the bounds that constrain a distribution when it is discretised: `max`
-#' truncates the support at that value, while `cdf_cutoff` trims the tail by
-#' keeping the distribution only up to its `cdf_cutoff` quantile. Either bound
+#' truncates the support at that value, while `cdf_max` trims the tail by
+#' keeping the distribution only up to its `cdf_max` quantile. Either bound
 #' drops the mass beyond it and renormalises the remaining PMF to sum to one.
 #' @param x A `<dist_spec>`.
 #' @param max Numeric, maximum value of the distribution. The distribution will
 #' be truncated at this value. Default: `Inf`, i.e. no maximum.
-#' @param cdf_cutoff Numeric in `(0, 1]`; the cumulative probability up to which
-#' the distribution is kept, i.e. it is truncated at the `cdf_cutoff` quantile.
-#' For example `cdf_cutoff = 0.999` keeps the distribution up to its 99.9th
+#' @param cdf_max Numeric in `(0, 1]`; the cumulative probability up to which
+#' the distribution is kept, i.e. it is truncated at the `cdf_max` quantile.
+#' For example `cdf_max = 0.999` keeps the distribution up to its 99.9th
 #' percentile. Default: `1`, i.e. keep the full distribution. A value below
 #' `0.5` is rejected, as it is almost certainly the tail probability to *drop*
 #' rather than the CDF level to keep (use `1 - x` instead).
+#' @param cdf_cutoff \[Deprecated\] Renamed to `cdf_max`. Supplying it warns
+#' and the value is interpreted as `cdf_max`, i.e. the CDF level to keep (the
+#' distspec 0.1.0 convention). A value in the historical EpiNow2 convention
+#' (the tail probability to drop) is caught by the guard against values below
+#' `0.5`; pass `cdf_max = 1 - cdf_cutoff` instead.
 #' @importFrom cli cli_abort
-#' @importFrom rlang `%||%`
+#' @importFrom rlang `%||%` caller_env
+#' @importFrom lifecycle deprecated is_present deprecate_warn
 #' @return a `<dist_spec>` with relevant attributes set that define its bounds
 #' @seealso [discretise()], which applies these bounds when producing a PMF.
 #' @export
@@ -235,8 +241,12 @@ discretize <- discretise
 #' # Truncate a gamma distribution at 20
 #' bound_dist(Gamma(mean = 5, sd = 1), max = 20)
 #' # Keep it up to its 99.9th percentile
-#' bound_dist(Gamma(mean = 5, sd = 1), cdf_cutoff = 0.999)
-bound_dist <- function(x, max = Inf, cdf_cutoff = 1) {
+#' bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
+bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
+  if (is_present(cdf_cutoff)) {
+    warn_cdf_cutoff_deprecated("bound_dist")
+    cdf_max <- cdf_cutoff
+  }
   if (!is(x, "dist_spec")) {
     cli_abort(
       c(
@@ -245,25 +255,25 @@ bound_dist <- function(x, max = Inf, cdf_cutoff = 1) {
       )
     )
   }
-  ## `cdf_cutoff` is the cumulative probability to keep up to (1 = keep the full
+  ## `cdf_max` is the cumulative probability to keep up to (1 = keep the full
   ## distribution); guard against the tail-probability-to-drop convention
-  if (!is.numeric(cdf_cutoff) || length(cdf_cutoff) != 1 ||
-        cdf_cutoff <= 0 || cdf_cutoff > 1) {
+  if (!is.numeric(cdf_max) || length(cdf_max) != 1 ||
+        cdf_max <= 0 || cdf_max > 1) {
     cli_abort(
       c(
-        "!" = "{.arg cdf_cutoff} must be a single number in `(0, 1]`.",
+        "!" = "{.arg cdf_max} must be a single number in `(0, 1]`.",
         "i" = "It is the cumulative probability to keep up to (e.g.
         {.val {0.999}}); `1` keeps the full distribution."
       )
     )
   }
-  if (cdf_cutoff < 0.5) {
+  if (cdf_max < 0.5) {
     cli_abort(
       c(
-        "!" = "{.arg cdf_cutoff} = {cdf_cutoff} would keep less than half of the
+        "!" = "{.arg cdf_max} = {cdf_max} would keep less than half of the
         distribution.",
-        "i" = "{.arg cdf_cutoff} is the CDF level to keep up to (e.g.
-        {.val {0.999}}). Did you mean {.code cdf_cutoff = {1 - cdf_cutoff}}?"
+        "i" = "{.arg cdf_max} is the CDF level to keep up to (e.g.
+        {.val {0.999}}). Did you mean {.code cdf_max = {1 - cdf_max}}?"
       )
     )
   }
@@ -271,10 +281,10 @@ bound_dist <- function(x, max = Inf, cdf_cutoff = 1) {
   ## fixed by the Dirichlet prior, so reject bounds rather than silently
   ## dropping them (`discretise()` would never apply them)
   if (ndist(x) == 1 && get_distribution(x) == "nonparametric" &&
-        has_uncertainty(x) && (cdf_cutoff < 1 || is.finite(max))) {
+        has_uncertainty(x) && (cdf_max < 1 || is.finite(max))) {
     cli_abort(
       c(
-        "!" = "Can't apply {.arg max} or {.arg cdf_cutoff} to an uncertain
+        "!" = "Can't apply {.arg max} or {.arg cdf_max} to an uncertain
         nonparametric distribution.",
         "i" = "Its support is set by the {.fn Dirichlet} prior; choose the
         number of bins there, or resolve it with {.fn fix_parameters} first."
@@ -286,9 +296,9 @@ bound_dist <- function(x, max = Inf, cdf_cutoff = 1) {
   if (ndist(x) == 1 && get_distribution(x) == "nonparametric" &&
         !has_uncertainty(x)) {
     pmf <- get_pmf(x)
-    if (cdf_cutoff < 1) {
+    if (cdf_max < 1) {
       cmf <- cumsum(pmf)
-      pmf <- pmf[c(TRUE, cmf[-length(cmf)] <= cdf_cutoff)]
+      pmf <- pmf[c(TRUE, cmf[-length(cmf)] <= cdf_max)]
     }
     if (is.finite(max) && length(pmf) > (max + 1)) {
       pmf <- pmf[seq_len(max + 1)]
@@ -296,7 +306,40 @@ bound_dist <- function(x, max = Inf, cdf_cutoff = 1) {
     x$pmf <- pmf / sum(pmf)
   } else {
     if (is.finite(max)) attr(x, "max") <- max
-    if (cdf_cutoff < 1) attr(x, "cdf_cutoff") <- cdf_cutoff
+    if (cdf_max < 1) attr(x, "cdf_max") <- cdf_max
   }
   x
+}
+
+# Shared deprecation warning for the `cdf_cutoff` argument, whose value is
+# interpreted as `cdf_max` (the CDF level to keep, the distspec 0.1.0
+# convention). A value in the historical EpiNow2 convention (the tail
+# probability to drop) is below 0.5 and so lands in the guard error, which
+# points to the `1 - x` conversion.
+#
+# The warning is attributed to the first frame on the call stack outside the
+# distspec namespace: `cdf_cutoff` may arrive via a constructor (user code ->
+# `Gamma()` -> `new_dist_spec()`), so the immediate caller is not necessarily
+# user code, and lifecycle's default attribution would blame distspec itself
+# (and throttle the warning accordingly).
+warn_cdf_cutoff_deprecated <- function(fn) {
+  ns <- topenv(environment())
+  n <- 2
+  user_env <- caller_env(n)
+  while (identical(topenv(user_env), ns) && n < 10) {
+    n <- n + 1
+    user_env <- tryCatch(caller_env(n), error = function(e) globalenv())
+  }
+  deprecate_warn(
+    "0.2.0",
+    paste0(fn, "(cdf_cutoff)"),
+    paste0(fn, "(cdf_max)"),
+    user_env = user_env,
+    details = c(
+      "The value is interpreted as `cdf_max`: the CDF level up to which the
+       distribution is kept (for example `cdf_max = 0.999`).",
+      "If your value was the tail probability to drop (the EpiNow2
+       convention), pass `cdf_max = 1 - cdf_cutoff` instead."
+    )
+  )
 }

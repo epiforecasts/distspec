@@ -12,7 +12,7 @@ test_that("every constructor produces a valid dist_spec", {
     Dirichlet(c(1, 1, 1, 1)),
     suppressWarnings(Gamma(shape = Normal(2, 0.5), rate = 1)),
     Gamma(shape = 2, rate = 1, max = 10),
-    Gamma(shape = 2, rate = 1, cdf_cutoff = 0.99)
+    Gamma(shape = 2, rate = 1, cdf_max = 0.99)
   )
   for (dist in dists) {
     expect_identical(validate_dist_spec(dist), dist)
@@ -42,10 +42,10 @@ test_that("a non-dist_spec object fails validation", {
   )
 })
 
-test_that("a bad cdf_cutoff fails validation", {
+test_that("a bad cdf_max fails validation", {
   dist <- Gamma(shape = 2, rate = 1)
-  attr(dist, "cdf_cutoff") <- 1.5
-  expect_error(validate_dist_spec(dist), "cdf_cutoff")
+  attr(dist, "cdf_max") <- 1.5
+  expect_error(validate_dist_spec(dist), "cdf_max")
 })
 
 test_that("a bad max fails validation", {

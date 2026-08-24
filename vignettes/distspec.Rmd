@@ -49,7 +49,7 @@ Gamma(mean = 4, sd = 2)
 LogNormal(meanlog = 1, sdlog = 0.5)
 ```
 
-A finite maximum (and, for parametric distributions, a `cdf_cutoff`) truncates
+A finite maximum (and, for parametric distributions, a `cdf_max`) truncates
 the support:
 
 ```{r bound}
