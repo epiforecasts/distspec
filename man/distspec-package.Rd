@@ -6,6 +6,8 @@
 \alias{distspec-package}
 \title{distspec: Probability Distributions with Certain or Uncertain Parameters}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Represents probability distributions with fixed or potentially uncertain parameters, with tools to discretise, convolve, sample from and summarise them.
 }
 \seealso{
