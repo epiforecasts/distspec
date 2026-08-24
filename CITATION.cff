@@ -8,7 +8,8 @@ message: 'To cite package "distspec" in publications use:'
 type: software
 license: MIT
 title: 'distspec: Probability Distributions with Certain or Uncertain Parameters'
-version: 0.1.0
+version: 0.1.0.9000
+doi: 10.32614/CRAN.package.distspec
 abstract: Represents probability distributions with fixed or potentially uncertain
   parameters, with tools to discretise, convolve, sample from and summarise them.
 authors:
@@ -24,6 +25,7 @@ authors:
   given-names: Sam
   email: sam.abbott@lshtm.ac.uk
   orcid: https://orcid.org/0000-0001-8057-8037
+repository: https://CRAN.R-project.org/package=distspec
 repository-code: https://github.com/epiforecasts/distspec
 url: https://epiforecasts.io/distspec/
 contact:
