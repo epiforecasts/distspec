@@ -226,15 +226,14 @@ discretize <- discretise
 #' percentile. Default: `1`, i.e. keep the full distribution. A value below
 #' `0.5` is rejected, as it is almost certainly the tail probability to *drop*
 #' rather than the CDF level to keep (use `1 - x` instead).
-#' @param cdf_cutoff \[Deprecated\] Renamed to `cdf_max`.
-#' Supplying it is an error: the name has meant both the CDF level to keep
-#' (distspec 0.1.0) and, historically in EpiNow2, the tail probability to drop,
-#' so no value can be interpreted safely. If your value was the CDF level to
-#' keep, pass it as `cdf_max`; if it was the tail probability to drop, pass
-#' `cdf_max = 1 - cdf_cutoff`.
+#' @param cdf_cutoff \[Deprecated\] Renamed to `cdf_max`. Supplying it warns
+#' and the value is interpreted as `cdf_max`, i.e. the CDF level to keep (the
+#' distspec 0.1.0 convention). A value in the historical EpiNow2 convention
+#' (the tail probability to drop) is caught by the guard against values below
+#' `0.5`; pass `cdf_max = 1 - cdf_cutoff` instead.
 #' @importFrom cli cli_abort
 #' @importFrom rlang `%||%`
-#' @importFrom lifecycle deprecated is_present deprecate_stop
+#' @importFrom lifecycle deprecated is_present deprecate_warn
 #' @return a `<dist_spec>` with relevant attributes set that define its bounds
 #' @seealso [discretise()], which applies these bounds when producing a PMF.
 #' @export
@@ -245,7 +244,8 @@ discretize <- discretise
 #' bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
   if (is_present(cdf_cutoff)) {
-    stop_cdf_cutoff_defunct("bound_dist")
+    warn_cdf_cutoff_deprecated("bound_dist")
+    cdf_max <- cdf_cutoff
   }
   if (!is(x, "dist_spec")) {
     cli_abort(
@@ -311,22 +311,21 @@ bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
   x
 }
 
-# Shared error for the defunct `cdf_cutoff` argument. The name has meant both
-# the CDF level to keep (distspec 0.1.0) and the tail probability to drop
-# (EpiNow2), so no supplied value can be interpreted safely and the caller must
-# choose the right conversion to `cdf_max` themselves.
-stop_cdf_cutoff_defunct <- function(fn) {
-  deprecate_stop(
+# Shared deprecation warning for the `cdf_cutoff` argument, whose value is
+# interpreted as `cdf_max` (the CDF level to keep, the distspec 0.1.0
+# convention). A value in the historical EpiNow2 convention (the tail
+# probability to drop) is below 0.5 and so lands in the guard error, which
+# points to the `1 - x` conversion.
+warn_cdf_cutoff_deprecated <- function(fn) {
+  deprecate_warn(
     "0.2.0",
     paste0(fn, "(cdf_cutoff)"),
     paste0(fn, "(cdf_max)"),
     details = c(
-      "`cdf_max` is the CDF level up to which the distribution is kept (for
-       example `cdf_max = 0.999`).",
-      "If your `cdf_cutoff` value was this CDF level (the distspec 0.1.0
-       convention), pass it unchanged as `cdf_max`.",
-      "If it was the tail probability to drop (the EpiNow2 convention), pass
-       `cdf_max = 1 - cdf_cutoff`."
+      "The value is interpreted as `cdf_max`: the CDF level up to which the
+       distribution is kept (for example `cdf_max = 0.999`).",
+      "If your value was the tail probability to drop (the EpiNow2
+       convention), pass `cdf_max = 1 - cdf_cutoff` instead."
     )
   )
 }

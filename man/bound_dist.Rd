@@ -19,12 +19,11 @@ percentile. Default: \code{1}, i.e. keep the full distribution. A value below
 \code{0.5} is rejected, as it is almost certainly the tail probability to \emph{drop}
 rather than the CDF level to keep (use \code{1 - x} instead).}
 
-\item{cdf_cutoff}{[Deprecated] Renamed to \code{cdf_max}.
-Supplying it is an error: the name has meant both the CDF level to keep
-(distspec 0.1.0) and, historically in EpiNow2, the tail probability to drop,
-so no value can be interpreted safely. If your value was the CDF level to
-keep, pass it as \code{cdf_max}; if it was the tail probability to drop, pass
-\code{cdf_max = 1 - cdf_cutoff}.}
+\item{cdf_cutoff}{[Deprecated] Renamed to \code{cdf_max}. Supplying it warns
+and the value is interpreted as \code{cdf_max}, i.e. the CDF level to keep (the
+distspec 0.1.0 convention). A value in the historical EpiNow2 convention
+(the tail probability to drop) is caught by the guard against values below
+\code{0.5}; pass \code{cdf_max = 1 - cdf_cutoff} instead.}
 }
 \value{
 a \verb{<dist_spec>} with relevant attributes set that define its bounds

@@ -77,7 +77,8 @@ extract_params <- function(params, distribution) {
 new_dist_spec <- function(params, distribution, max = Inf, cdf_max = 1,
                           cdf_cutoff = deprecated()) {
   if (is_present(cdf_cutoff)) {
-    stop_cdf_cutoff_defunct("new_dist_spec")
+    warn_cdf_cutoff_deprecated("new_dist_spec")
+    cdf_max <- cdf_cutoff
   }
   if (distribution == "nonparametric") {
     ## nonparametric distribution
