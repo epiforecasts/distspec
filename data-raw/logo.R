@@ -37,7 +37,7 @@ bw <- 0.8 * (x1 - x0) / xmax
 bars <- sprintf(
   paste0(
     '  <rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="10"',
-    ' fill="#4cc9f0" opacity="0.75"/>'
+    ' fill="#2196C4" opacity="0.72"/>'
   ),
   px(ints + 0.1), py(pmf), bw, base - py(pmf)
 )
@@ -54,7 +54,7 @@ curves <- vapply(seq_along(shapes), function(i) {
   central <- shapes[i] == 4.0
   sprintf(
     paste0(
-      '  <path d="%s" fill="none" stroke="#ffb703" stroke-width="%d"',
+      '  <path d="%s" fill="none" stroke="#DE8E00" stroke-width="%d"',
       ' stroke-linecap="round" opacity="%.2f"/>'
     ),
     curve_path(shapes[i], rates[i]), if (central) 14 else 9,
@@ -68,8 +68,8 @@ svg <- c(
   ),
   "  <defs>",
   '    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">',
-  '      <stop offset="0" stop-color="#24406b"/>',
-  '      <stop offset="1" stop-color="#131f36"/>',
+  '      <stop offset="0" stop-color="#FFFFFF"/>',
+  '      <stop offset="1" stop-color="#E7F0F8"/>',
   "    </linearGradient>",
   sprintf(
     '    <clipPath id="hexclip"><polygon points="%s"/></clipPath>', hex_pts
@@ -79,7 +79,7 @@ svg <- c(
   '  <g clip-path="url(#hexclip)">',
   sprintf(
     paste0(
-      '  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#8da9c4"',
+      '  <line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#B9CCDE"',
       ' stroke-width="6" opacity="0.6"/>'
     ),
     x0 - 40, base, x1 + 40, base
@@ -90,11 +90,11 @@ svg <- c(
   paste0(
     '  <text x="', cx, '" y="1610" text-anchor="middle" ',
     'font-family="Fira Sans, sans-serif" font-weight="600" ',
-    'font-size="240" fill="#f4f7fb">dist',
-    '<tspan fill="#4cc9f0">spec</tspan></text>'
+    'font-size="240" fill="#16283F">dist',
+    '<tspan fill="#1682B0">spec</tspan></text>'
   ),
   sprintf(
-    '  <polygon points="%s" fill="none" stroke="#4cc9f0" stroke-width="26"/>',
+    '  <polygon points="%s" fill="none" stroke="#1682B0" stroke-width="26"/>',
     hex_pts
   ),
   "</svg>"
