@@ -232,7 +232,7 @@ discretize <- discretise
 #' (the tail probability to drop) is caught by the guard against values below
 #' `0.5`; pass `cdf_max = 1 - cdf_cutoff` instead.
 #' @importFrom cli cli_abort
-#' @importFrom rlang `%||%`
+#' @importFrom rlang `%||%` caller_env
 #' @importFrom lifecycle deprecated is_present deprecate_warn
 #' @return a `<dist_spec>` with relevant attributes set that define its bounds
 #' @seealso [discretise()], which applies these bounds when producing a PMF.
@@ -244,7 +244,7 @@ discretize <- discretise
 #' bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
   if (is_present(cdf_cutoff)) {
-    warn_cdf_cutoff_deprecated("bound_dist")
+    warn_cdf_cutoff_deprecated("bound_dist", user_env = caller_env())
     cdf_max <- cdf_cutoff
   }
   if (!is(x, "dist_spec")) {
@@ -315,12 +315,15 @@ bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
 # interpreted as `cdf_max` (the CDF level to keep, the distspec 0.1.0
 # convention). A value in the historical EpiNow2 convention (the tail
 # probability to drop) is below 0.5 and so lands in the guard error, which
-# points to the `1 - x` conversion.
-warn_cdf_cutoff_deprecated <- function(fn) {
+# points to the `1 - x` conversion. `user_env` must be the frame of the user
+# code that supplied `cdf_cutoff`, so lifecycle attributes the deprecated
+# usage (and its warning frequency) to the caller rather than to distspec.
+warn_cdf_cutoff_deprecated <- function(fn, user_env) {
   deprecate_warn(
     "0.2.0",
     paste0(fn, "(cdf_cutoff)"),
     paste0(fn, "(cdf_max)"),
+    user_env = user_env,
     details = c(
       "The value is interpreted as `cdf_max`: the CDF level up to which the
        distribution is kept (for example `cdf_max = 0.999`).",

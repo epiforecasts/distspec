@@ -67,6 +67,7 @@ extract_params <- function(params, distribution) {
 #' @inheritParams bound_dist
 #' @importFrom cli cli_abort cli_warn
 #' @importFrom lifecycle deprecated is_present
+#' @importFrom rlang caller_env
 #' @return A `dist_spec` of the given specification.
 #' @export
 #' @examples
@@ -77,7 +78,9 @@ extract_params <- function(params, distribution) {
 new_dist_spec <- function(params, distribution, max = Inf, cdf_max = 1,
                           cdf_cutoff = deprecated()) {
   if (is_present(cdf_cutoff)) {
-    warn_cdf_cutoff_deprecated("new_dist_spec")
+    ## the user's frame is two levels up: the constructors (`Gamma()` etc.)
+    ## forward their `...` here, so `caller_env()` would be the constructor
+    warn_cdf_cutoff_deprecated("new_dist_spec", user_env = caller_env(2))
     cdf_max <- cdf_cutoff
   }
   if (distribution == "nonparametric") {
