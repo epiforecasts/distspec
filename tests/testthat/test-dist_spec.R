@@ -191,22 +191,22 @@ test_that("`bound_dist` function can be applied to a convolution", {
   combined <- collapse(discretise(c(dist1, dist2)))
 
   # Compute combined distribution with larger CDF cutoff
-  combined_cdf_cutoff <- bound_dist(combined, cdf_cutoff = 0.999)
+  combined_cdf_max <- bound_dist(combined, cdf_max = 0.999)
 
   combined_pmf <- get_pmf(combined)
-  combined_cdf_cutoff_pmf <- get_pmf(combined_cdf_cutoff)
+  combined_cdf_max_pmf <- get_pmf(combined_cdf_max)
 
   # The length of the combined PMF should be greater with default CDF cutoff
-  expect_true(length(combined_pmf) > length(combined_cdf_cutoff_pmf))
+  expect_true(length(combined_pmf) > length(combined_cdf_max_pmf))
   # Both should sum to 1
   expect_equal(sum(combined_pmf), 1)
-  expect_equal(sum(combined_cdf_cutoff_pmf), 1)
+  expect_equal(sum(combined_cdf_max_pmf), 1)
   # The first 5 entries should be within 0.01 of each other
   expect_equal(
-    combined_pmf[1:5], combined_cdf_cutoff_pmf[1:5],
+    combined_pmf[1:5], combined_cdf_max_pmf[1:5],
     tolerance = 0.01
   )
-  expect_equal(mean(combined), mean(combined_cdf_cutoff), tolerance = 0.1)
+  expect_equal(mean(combined), mean(combined_cdf_max), tolerance = 0.1)
 })
 
 test_that("mean returns correct output for sum of two distributions", {
@@ -314,9 +314,9 @@ test_that("plot.dist_spec errors on an unbounded distribution", {
   skip_if_not_installed("ggplot2")
   expect_error(plot(Gamma(mean = 4, sd = 2)), "no finite range")
   expect_error(plot(LogNormal(meanlog = 1.5, sdlog = 0.5)), "no finite range")
-  ## a bounded distribution plots fine, either via max or cdf_cutoff
+  ## a bounded distribution plots fine, either via max or cdf_max
   expect_s3_class(plot(Gamma(mean = 4, sd = 2, max = 20)), "ggplot")
-  expect_s3_class(plot(Gamma(mean = 4, sd = 2, cdf_cutoff = 0.999)), "ggplot")
+  expect_s3_class(plot(Gamma(mean = 4, sd = 2, cdf_max = 0.999)), "ggplot")
 })
 
 test_that("plot.dist_spec errors on an unbounded uncertain distribution", {
@@ -395,7 +395,7 @@ test_that("composite delay distributions can be disassembled", {
 test_that("constrained distributions are correctly identified", {
   expect_false(is_constrained(Gamma(shape = 3, scale = 2)))
   expect_true(is_constrained(Gamma(shape = 3, scale = 2, max = 10)))
-  expect_true(is_constrained(Gamma(shape = 3, scale = 2, cdf_cutoff = 0.9)))
+  expect_true(is_constrained(Gamma(shape = 3, scale = 2, cdf_max = 0.9)))
   expect_false(is_constrained(
     Gamma(shape = 3, scale = 2) +
       Gamma(shape = 3, scale = 2, max = 10)
@@ -418,7 +418,7 @@ test_that("delay distributions can be specified in different ways", {
   )
   expect_equal(
     round(
-      get_pmf(discretise(LogNormal(mean = 4, sd = 1, cdf_cutoff = 0.9))), 2
+      get_pmf(discretise(LogNormal(mean = 4, sd = 1, cdf_max = 0.9))), 2
     ),
     c(0.00, 0.00, 0.05, 0.32, 0.41, 0.22)
   )
@@ -432,7 +432,7 @@ test_that("delay distributions can be specified in different ways", {
     c(0.00, 0.00, 0.06, 0.28, 0.38, 0.22, 0.07)
   )
   expect_equal(
-    round(get_pmf(discretise(Gamma(mean = 4, sd = 1, cdf_cutoff = 0.9))), 2),
+    round(get_pmf(discretise(Gamma(mean = 4, sd = 1, cdf_max = 0.9))), 2),
     c(0.00, 0.00, 0.06, 0.30, 0.40, 0.23)
   )
   expect_equal(
@@ -465,7 +465,7 @@ test_that("delay distributions can be specified in different ways", {
     c(0.00, 0.01, 0.10, 0.35, 0.54)
   )
   expect_equal(
-    round(get_pmf(discretise(Normal(mean = 4, sd = 1, cdf_cutoff = 0.9))), 2),
+    round(get_pmf(discretise(Normal(mean = 4, sd = 1, cdf_max = 0.9))), 2),
     c(0.00, 0.01, 0.07, 0.26, 0.40, 0.26)
   )
   expect_equal(

@@ -66,6 +66,7 @@ extract_params <- function(params, distribution) {
 #'   `"lognormal"`, `"nonparametric"`).
 #' @inheritParams bound_dist
 #' @importFrom cli cli_abort cli_warn
+#' @importFrom lifecycle deprecated is_present
 #' @return A `dist_spec` of the given specification.
 #' @export
 #' @examples
@@ -73,7 +74,11 @@ extract_params <- function(params, distribution) {
 #'   params = list(mean = 2, sd = 1),
 #'   distribution = "normal"
 #' )
-new_dist_spec <- function(params, distribution, max = Inf, cdf_cutoff = 1) {
+new_dist_spec <- function(params, distribution, max = Inf, cdf_max = 1,
+                          cdf_cutoff = deprecated()) {
+  if (is_present(cdf_cutoff)) {
+    stop_cdf_cutoff_defunct("new_dist_spec")
+  }
   if (distribution == "nonparametric") {
     ## nonparametric distribution
     if (inherits(params$pmf, "dist_spec")) {
@@ -174,7 +179,7 @@ new_dist_spec <- function(params, distribution, max = Inf, cdf_cutoff = 1) {
   }
 
   ## apply bounds
-  ret <- bound_dist(ret, max, cdf_cutoff)
+  ret <- bound_dist(ret, max, cdf_max)
 
   ## mark uncertain distributions so the shared handlers dispatch
   ret <- mark_uncertainty(ret)

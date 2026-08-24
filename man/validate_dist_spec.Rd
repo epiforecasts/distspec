@@ -14,7 +14,7 @@ validate_dist_spec(x)
 }
 \description{
 Asserts the structural invariants of a \verb{<dist_spec>}: its class, the shape of
-its parameters, and its \code{max}/\code{cdf_cutoff} attributes. Called by every
+its parameters, and its \code{max}/\code{cdf_max} attributes. Called by every
 constructor on the object it builds, so a \verb{<dist_spec>} from the package is
 always well-formed. A composite is valid when each of its components is.
 }

@@ -7,17 +7,35 @@ test_that("Exp() is deprecated in favour of Exponential()", {
   expect_s3_class(suppressWarnings(Exp(rate = 1)), "dist_spec")
 })
 
-test_that("cdf_cutoff below 0.5 is rejected with a helpful error", {
+test_that("cdf_max below 0.5 is rejected with a helpful error", {
   expect_error(
-    bound_dist(Gamma(mean = 4, sd = 1), cdf_cutoff = 0.01),
+    bound_dist(Gamma(mean = 4, sd = 1), cdf_max = 0.01),
     "keep less than half"
   )
   expect_error(
-    Gamma(mean = 4, sd = 1, cdf_cutoff = 0.01),
+    Gamma(mean = 4, sd = 1, cdf_max = 0.01),
     "keep less than half"
   )
   expect_error(
-    bound_dist(Gamma(mean = 4, sd = 1), cdf_cutoff = 1.5),
+    bound_dist(Gamma(mean = 4, sd = 1), cdf_max = 1.5),
     "must be a single number"
+  )
+})
+
+test_that("the cdf_cutoff argument is defunct in favour of cdf_max", {
+  expect_error(
+    bound_dist(Gamma(mean = 4, sd = 1), cdf_cutoff = 0.999),
+    "cdf_max"
+  )
+  expect_error(
+    Gamma(mean = 4, sd = 1, cdf_cutoff = 0.999),
+    "cdf_max"
+  )
+  expect_error(
+    new_dist_spec(
+      params = list(mean = 2, sd = 1), distribution = "normal",
+      cdf_cutoff = 0.999
+    ),
+    "cdf_max"
   )
 })

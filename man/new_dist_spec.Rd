@@ -5,7 +5,13 @@
 \title{Internal function for generating a \code{dist_spec} given parameters and a
 distribution.}
 \usage{
-new_dist_spec(params, distribution, max = Inf, cdf_cutoff = 1)
+new_dist_spec(
+  params,
+  distribution,
+  max = Inf,
+  cdf_max = 1,
+  cdf_cutoff = deprecated()
+)
 }
 \arguments{
 \item{params}{Parameters of the distribution (including \code{max})}
@@ -16,12 +22,19 @@ new_dist_spec(params, distribution, max = Inf, cdf_cutoff = 1)
 \item{max}{Numeric, maximum value of the distribution. The distribution will
 be truncated at this value. Default: \code{Inf}, i.e. no maximum.}
 
-\item{cdf_cutoff}{Numeric in \verb{(0, 1]}; the cumulative probability up to which
-the distribution is kept, i.e. it is truncated at the \code{cdf_cutoff} quantile.
-For example \code{cdf_cutoff = 0.999} keeps the distribution up to its 99.9th
+\item{cdf_max}{Numeric in \verb{(0, 1]}; the cumulative probability up to which
+the distribution is kept, i.e. it is truncated at the \code{cdf_max} quantile.
+For example \code{cdf_max = 0.999} keeps the distribution up to its 99.9th
 percentile. Default: \code{1}, i.e. keep the full distribution. A value below
 \code{0.5} is rejected, as it is almost certainly the tail probability to \emph{drop}
 rather than the CDF level to keep (use \code{1 - x} instead).}
+
+\item{cdf_cutoff}{[Deprecated] Renamed to \code{cdf_max}.
+Supplying it is an error: the name has meant both the CDF level to keep
+(distspec 0.1.0) and, historically in EpiNow2, the tail probability to drop,
+so no value can be interpreted safely. If your value was the CDF level to
+keep, pass it as \code{cdf_max}; if it was the tail probability to drop, pass
+\code{cdf_max = 1 - cdf_cutoff}.}
 }
 \value{
 A \code{dist_spec} of the given specification.

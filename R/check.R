@@ -17,7 +17,7 @@ check_sparse_pmf_tail <- function(pmf, span = 5, tol = 1e-6) {
         "!" = "The PMF tail has {col_blue(span)} consecutive value{?s} smaller
         than {col_blue(tol)}.",
         "i" = "This will increase run times with very small increases in
-        accuracy. Consider using the `cdf_cutoff` argument when constructing
+        accuracy. Consider using the `cdf_max` argument when constructing
         the distribution object, or using the `bound_dist()` function."
       ),
       .frequency = "regularly",
@@ -72,7 +72,7 @@ check_pmf_values <- function(x, arg = "pmf") {
 #'
 #' @description
 #' Asserts the structural invariants of a `<dist_spec>`: its class, the shape of
-#' its parameters, and its `max`/`cdf_cutoff` attributes. Called by every
+#' its parameters, and its `max`/`cdf_max` attributes. Called by every
 #' constructor on the object it builds, so a `<dist_spec>` from the package is
 #' always well-formed. A composite is valid when each of its components is.
 #'
@@ -149,7 +149,7 @@ validate_dist_spec <- function(x) {
     }
   }
 
-  ## the `max` and `cdf_cutoff` attributes, if present, must be well-formed
+  ## the `max` and `cdf_max` attributes, if present, must be well-formed
   max_value <- attr(x, "max")
   if (!is.null(max_value)) {
     if (!is.numeric(max_value) || length(max_value) != 1 || is.na(max_value) ||
@@ -161,12 +161,12 @@ validate_dist_spec <- function(x) {
     }
   }
 
-  cdf_cutoff <- attr(x, "cdf_cutoff")
-  if (!is.null(cdf_cutoff)) {
-    if (!is.numeric(cdf_cutoff) || length(cdf_cutoff) != 1 ||
-          is.na(cdf_cutoff) || cdf_cutoff <= 0 || cdf_cutoff > 1) {
+  cdf_max <- attr(x, "cdf_max")
+  if (!is.null(cdf_max)) {
+    if (!is.numeric(cdf_max) || length(cdf_max) != 1 ||
+          is.na(cdf_max) || cdf_max <= 0 || cdf_max > 1) {
       cli_abort(
-        "The {.field cdf_cutoff} attribute of a {.cls dist_spec} must be a
+        "The {.field cdf_max} attribute of a {.cls dist_spec} must be a
         single numeric in {.code (0, 1]}."
       )
     }

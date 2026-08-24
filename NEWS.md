@@ -1,3 +1,18 @@
+# distspec (development version)
+
+## Breaking changes
+
+- The `cdf_cutoff` argument of `bound_dist()` and `new_dist_spec()` (and of
+  the distribution constructors, which pass it on) has been renamed to
+  `cdf_max`: the CDF level up to which the distribution is kept, mirroring
+  `max` on the probability axis (`max = 10` truncates at the value 10,
+  `cdf_max = 0.999` at the 99.9% quantile). The semantics are unchanged.
+  Supplying `cdf_cutoff` is an error rather than a soft-deprecated alias,
+  because the name has meant both the CDF level to keep (distspec 0.1.0) and
+  the tail probability to drop (EpiNow2), so no value can be interpreted
+  safely; the error message explains the conversion for both conventions.
+  The internal attribute carrying the bound is renamed accordingly.
+
 # distspec 0.1.0
 
 distspec 0.1.0 splits the `<dist_spec>` interface out of EpiNow2. The entries
