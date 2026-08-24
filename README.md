@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# distspec: probability distributions with certain or uncertain parameters
+# distspec: probability distributions with certain or uncertain parameters <img src="man/figures/logo.png" align="right" height="139" alt="distspec hex logo" />
 
 <!-- badges: start -->
 
@@ -123,9 +123,7 @@ representation.
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-
 <!-- prettier-ignore-start -->
-
 <!-- markdownlint-disable -->
 
 All contributions to this project are gratefully acknowledged using the
@@ -146,7 +144,5 @@ specification. Contributions of any kind are welcome!
 <a href="https://github.com/epiforecasts/distspec/issues?q=is%3Aissue+author%3Ajamesmbaazam">jamesmbaazam</a>
 
 <!-- markdownlint-enable -->
-
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->

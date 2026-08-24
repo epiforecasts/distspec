@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# distspec: probability distributions with certain or uncertain parameters
+# distspec: probability distributions with certain or uncertain parameters <img src="man/figures/logo.png" align="right" height="139" alt="distspec hex logo" />
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![R-CMD-check](https://github.com/epiforecasts/distspec/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/epiforecasts/distspec/actions/workflows/R-CMD-check.yaml) [![Codecov test coverage](https://codecov.io/gh/epiforecasts/distspec/graph/badge.svg)](https://app.codecov.io/gh/epiforecasts/distspec) [![CRAN status](https://www.r-pkg.org/badges/version/distspec)](https://CRAN.R-project.org/package=distspec)
