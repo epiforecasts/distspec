@@ -1,3 +1,7 @@
+# distspec (development version)
+
+- Added a hex sticker logo, shown in the README and on the pkgdown site.
+
 # distspec 0.1.0
 
 distspec 0.1.0 splits the `<dist_spec>` interface out of EpiNow2. The entries
