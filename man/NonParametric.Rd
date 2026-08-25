@@ -25,8 +25,8 @@ passing a \code{\link[=Dirichlet]{Dirichlet()}} prior.
 The constructed \verb{<dist_spec>} stores the PMF in its \code{pmf} element, whose
 content mirrors how every other distribution stores an uncertain parameter:
 for a fixed distribution it is a numeric vector (the normalised PMF), and
-for an uncertain one it is the prior itself, a \verb{<dist_spec>} such as a
-\code{\link[=Dirichlet]{Dirichlet()}}. Just as \code{Gamma(shape = Normal(3, 0.5), rate = 2)} holds a
+for an uncertain one it is the \code{\link[=Dirichlet]{Dirichlet()}} prior itself, as a
+\verb{<dist_spec>}. Just as \code{Gamma(shape = Normal(3, 0.5), rate = 2)} holds a
 \verb{<dist_spec>} in its \code{shape} parameter, an uncertain nonparametric
 distribution holds its prior in place of a concrete PMF, and has no PMF
 until the prior is resolved.

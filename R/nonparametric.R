@@ -21,8 +21,8 @@
 #' The constructed `<dist_spec>` stores the PMF in its `pmf` element, whose
 #' content mirrors how every other distribution stores an uncertain parameter:
 #' for a fixed distribution it is a numeric vector (the normalised PMF), and
-#' for an uncertain one it is the prior itself, a `<dist_spec>` such as a
-#' [Dirichlet()]. Just as `Gamma(shape = Normal(3, 0.5), rate = 2)` holds a
+#' for an uncertain one it is the [Dirichlet()] prior itself, as a
+#' `<dist_spec>`. Just as `Gamma(shape = Normal(3, 0.5), rate = 2)` holds a
 #' `<dist_spec>` in its `shape` parameter, an uncertain nonparametric
 #' distribution holds its prior in place of a concrete PMF, and has no PMF
 #' until the prior is resolved.
