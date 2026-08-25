@@ -17,9 +17,9 @@
 #' @param x Object to convert: a `<dist_spec>`, a single number, or a numeric
 #'   vector representing a probability mass function (zero-indexed, i.e. the
 #'   first entry is the mass at zero; normalised to sum to one).
-#' @param ... Additional arguments passed to methods. The numeric method
-#'   passes them to [NonParametric()] (for a vector) or [Fixed()] (for a
-#'   single number).
+#' @param ... Additional arguments passed to methods. Every method forwards
+#'   them to [bound_dist()] (directly for a `<dist_spec>`, via the constructor
+#'   otherwise), so limits such as `max` apply regardless of the input class.
 #' @return A `<dist_spec>`.
 #' @seealso [Distributions] for the constructors this converts to.
 #' @export
@@ -39,7 +39,7 @@ as_dist_spec <- function(x, ...) {
 #' @rdname as_dist_spec
 #' @export
 as_dist_spec.dist_spec <- function(x, ...) {
-  x
+  bound_dist(x, ...)
 }
 
 #' @rdname as_dist_spec

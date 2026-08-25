@@ -20,9 +20,9 @@ as_dist_spec(x, ...)
 vector representing a probability mass function (zero-indexed, i.e. the
 first entry is the mass at zero; normalised to sum to one).}
 
-\item{...}{Additional arguments passed to methods. The numeric method
-passes them to \code{\link[=NonParametric]{NonParametric()}} (for a vector) or \code{\link[=Fixed]{Fixed()}} (for a
-single number).}
+\item{...}{Additional arguments passed to methods. Every method forwards
+them to \code{\link[=bound_dist]{bound_dist()}} (directly for a \verb{<dist_spec>}, via the constructor
+otherwise), so limits such as \code{max} apply regardless of the input class.}
 }
 \value{
 A \verb{<dist_spec>}.

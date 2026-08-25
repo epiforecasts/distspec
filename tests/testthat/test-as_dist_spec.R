@@ -20,13 +20,17 @@ test_that("as_dist_spec() converts a single number to a fixed distribution", {
   expect_equal(as_dist_spec(0), Fixed(0))
 })
 
-test_that("as_dist_spec() passes bounds on to the constructor", {
+test_that("as_dist_spec() passes bounds on whatever the input class", {
   pmf <- c(0.1, 0.4, 0.3, 0.2)
   expect_equal(as_dist_spec(pmf, max = 2), NonParametric(pmf = pmf, max = 2))
   ## the scalar branch forwards bounds to Fixed()
   bounded <- as_dist_spec(3, max = 5)
   expect_equal(bounded, Fixed(3, max = 5))
   expect_equal(attr(bounded, "max"), 5)
+  ## a <dist_spec> input is bounded too
+  dist <- Gamma(mean = 4, sd = 1)
+  expect_equal(as_dist_spec(dist, max = 5), bound_dist(dist, max = 5))
+  expect_equal(attr(as_dist_spec(dist, max = 5), "max"), 5)
 })
 
 test_that("as_dist_spec() rejects a non-finite single number informatively", {
