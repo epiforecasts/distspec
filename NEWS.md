@@ -25,6 +25,9 @@
 
 - `Fixed()` now forwards its `...` to `bound_dist()` as documented; previously
   limits such as `Fixed(3, max = 5)` were silently dropped.
+- A non-finite `Fixed()` value (e.g. `NA` or `Inf`) is now rejected with an
+  informative error; previously it raised a bare condition error from the
+  internal bound check.
 
 ## Documentation
 

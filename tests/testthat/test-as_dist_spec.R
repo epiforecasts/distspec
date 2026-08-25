@@ -29,6 +29,12 @@ test_that("as_dist_spec() passes bounds on to the constructor", {
   expect_equal(attr(bounded, "max"), 5)
 })
 
+test_that("as_dist_spec() rejects a non-finite single number informatively", {
+  expect_error(as_dist_spec(NA_real_), "finite")
+  expect_error(as_dist_spec(Inf), "finite")
+  expect_error(Fixed(NaN), "finite")
+})
+
 test_that("as_dist_spec() errors informatively on unsupported classes", {
   expect_error(as_dist_spec("gamma"), "character")
   expect_error(as_dist_spec(list(shape = 2)), "list")

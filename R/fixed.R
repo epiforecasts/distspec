@@ -26,6 +26,14 @@ Fixed <- function(value, ...) {
 # Validate a fixed `value` against its lower bound. An uncertain (non-numeric)
 # value is bound-checked when sampled rather than here.
 validate_fixed_value <- function(value) {
+  if (is.numeric(value) && any(!is.finite(value))) {
+    cli_abort(
+      c(
+        "!" = "Parameter {.arg value} must be a finite number.",
+        "i" = "It is {.val {value}}."
+      )
+    )
+  }
   lb <- lower_bounds(dist_prototype("fixed"))[["value"]]
   if (is.numeric(value) && any(value < lb)) {
     cli_abort(
