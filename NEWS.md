@@ -1,5 +1,13 @@
 # distspec (development version)
 
+## New features
+
+- Added `as_dist_spec()`, a generic for converting other representations of a
+  probability distribution to a `<dist_spec>`: a `<dist_spec>` is returned
+  unchanged, a numeric PMF vector becomes a `NonParametric()` and a single
+  number a `Fixed()`. Other packages can register methods for their own
+  classes without a dependency in either direction.
+
 ## Deprecations
 
 - The `cdf_cutoff` argument of `bound_dist()` and `new_dist_spec()` (and of
