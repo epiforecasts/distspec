@@ -21,6 +21,11 @@
   `1 - x` conversion. The internal attribute carrying the bound is renamed
   accordingly.
 
+## Bug fixes
+
+- `Fixed()` now forwards its `...` to `bound_dist()` as documented; previously
+  limits such as `Fixed(3, max = 5)` were silently dropped.
+
 ## Documentation
 
 - Added a hex sticker logo, shown in the README and on the pkgdown site.

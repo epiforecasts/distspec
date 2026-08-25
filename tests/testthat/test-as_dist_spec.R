@@ -23,6 +23,10 @@ test_that("as_dist_spec() converts a single number to a fixed distribution", {
 test_that("as_dist_spec() passes bounds on to the constructor", {
   pmf <- c(0.1, 0.4, 0.3, 0.2)
   expect_equal(as_dist_spec(pmf, max = 2), NonParametric(pmf = pmf, max = 2))
+  ## the scalar branch forwards bounds to Fixed()
+  bounded <- as_dist_spec(3, max = 5)
+  expect_equal(bounded, Fixed(3, max = 5))
+  expect_equal(attr(bounded, "max"), 5)
 })
 
 test_that("as_dist_spec() errors informatively on unsupported classes", {

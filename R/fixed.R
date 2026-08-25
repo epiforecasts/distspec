@@ -20,7 +20,7 @@
 #' Fixed(value = 3.5)
 Fixed <- function(value, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "fixed")
+  new_dist_spec(params, "fixed", ...)
 }
 
 # Validate a fixed `value` against its lower bound. An uncertain (non-numeric)
