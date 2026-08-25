@@ -26,4 +26,3 @@ nonparametric distribution whose PMF is given by a \verb{<dist_spec>} (a
 has_uncertainty(Gamma(shape = 1, rate = 1))
 has_uncertainty(Gamma(shape = Normal(1, 0.5), rate = 1))
 }
-\keyword{internal}

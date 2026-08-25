@@ -32,6 +32,7 @@ reference:
       - get_distribution
       - get_parameters
       - get_pmf
+      - has_uncertainty
       - ndist
   - title: Summarise distributions
     desc: Summary statistics of a distribution.
