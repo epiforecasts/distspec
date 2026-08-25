@@ -291,6 +291,18 @@ bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
       )
     )
   }
+  ## a point mass has no tail to trim: a finite `max` below the fixed value
+  ## would drop all of its probability mass, so reject it
+  if (ndist(x) == 1 && get_distribution(x) == "fixed" &&
+        is.numeric(x$parameters$value) && max < x$parameters$value) {
+    cli_abort(
+      c(
+        "!" = "{.arg max} ({max}) is below the value of the fixed distribution
+        ({x$parameters$value}), so it would drop all probability mass.",
+        "i" = "Set {.arg max} to at least the fixed value."
+      )
+    )
+  }
   ## if it is a single fixed-PMF nonparametric distribution we apply the bounds
   ## directly; an uncertain one has no PMF, so it keeps the attribute-based path
   if (ndist(x) == 1 && get_distribution(x) == "nonparametric" &&

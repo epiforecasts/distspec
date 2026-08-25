@@ -32,3 +32,12 @@ test_that("an uncertain fixed value is not truncated below one when sampled", {
   )
   expect_lt(get_parameters(sampled)$value, 1)
 })
+
+test_that("bounding a fixed distribution keeps the PMF valid", {
+  ## a max below the value would drop all mass, so it is rejected
+  expect_error(Fixed(6, max = 5), "drop all probability mass")
+  ## partial truncation of a fractional point mass renormalises
+  expect_equal(get_pmf(discretise(Fixed(4.5, max = 5))), c(0, 0, 0, 0, 1))
+  ## a value with no bin below max errors at discretisation
+  expect_error(discretise(Fixed(5, max = 5)), "leaves no probability")
+})

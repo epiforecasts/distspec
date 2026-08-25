@@ -94,5 +94,17 @@ discrete_pmf.fixed <- function(x, max_value, ...) {
       }
     }
   }
-  pmf
+  ## truncating at `max_value` can drop some or all of the point mass; drop
+  ## and renormalise per the bound contract, and error if nothing remains
+  total <- sum(pmf)
+  if (total == 0) {
+    cli_abort(
+      c(
+        "!" = "Discretising this fixed distribution (value {value}) leaves no
+        probability mass below {.arg max} = {max_value}.",
+        "i" = "Set {.arg max} to at least {ceiling(value) + 1}."
+      )
+    )
+  }
+  pmf / total
 }

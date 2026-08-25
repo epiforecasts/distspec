@@ -28,6 +28,10 @@
 - A non-finite `Fixed()` value (e.g. `NA` or `Inf`) is now rejected with an
   informative error; previously it raised a bare condition error from the
   internal bound check.
+- Bounding a fixed distribution below its value (e.g. `Fixed(6, max = 5)`) is
+  now rejected, and discretising a partially truncated fixed distribution
+  renormalises the PMF to sum to one; previously both silently produced an
+  invalid PMF.
 
 ## Documentation
 
