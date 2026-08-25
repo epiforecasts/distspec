@@ -17,6 +17,21 @@
 #'   first entry is the mass at zero) or a `<dist_spec>` (e.g. from
 #'   [Dirichlet()]). A numeric vector is normalised to sum to one.
 #' @param ... Limits of the distribution, passed to [bound_dist()].
+#' @details
+#' The constructed `<dist_spec>` stores the PMF in its `pmf` element, whose
+#' content mirrors how every other distribution stores an uncertain parameter:
+#' for a fixed distribution it is a numeric vector (the normalised PMF), and
+#' for an uncertain one it is the prior itself, a `<dist_spec>` such as a
+#' [Dirichlet()]. Just as `Gamma(shape = Normal(3, 0.5), rate = 2)` holds a
+#' `<dist_spec>` in its `shape` parameter, an uncertain nonparametric
+#' distribution holds its prior in place of a concrete PMF, and has no PMF
+#' until the prior is resolved.
+#'
+#' Code inspecting a distribution should use the accessors rather than reading
+#' the element directly: [get_pmf()] returns the PMF of a fixed nonparametric
+#' distribution and errors for an uncertain one, [has_uncertainty()] reports
+#' whether a prior is present, and [fix_parameters()] resolves the prior to a
+#' fixed PMF (e.g. with `strategy = "mean"`).
 #' @return A `<dist_spec>`.
 #' @seealso [Distributions] for an overview and the other distributions.
 #' @export
