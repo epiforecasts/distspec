@@ -1,7 +1,7 @@
 Type: Package
 Package: distspec
 Title: Probability Distributions with Certain or Uncertain Parameters
-Version: 0.1.0.9000
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Sebastian",
              family = "Funk",
@@ -23,7 +23,7 @@ Description: Represents probability distributions with fixed or potentially
     uncertain parameters, with tools to discretise, convolve, sample from and
     summarise them.
 License: MIT + file LICENSE
-URL: https://epiforecasts.io/distspec/
+URL: https://epiforecasts.io/distspec/, https://github.com/epiforecasts/distspec
 BugReports: https://github.com/epiforecasts/distspec/issues
 Depends: 
     R (>= 3.5.0)

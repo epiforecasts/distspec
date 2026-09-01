@@ -1,11 +1,7 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+0 errors | 0 warnings | 0 notes
 
 ## Notes
 
-This is the first submission of distspec to CRAN. The package provides the
-probability-distribution interface previously bundled inside the EpiNow2
-package, now split out so it can be reused independently.
+This release comes four weeks after the initial 0.1.0 submission, sooner than the usual update cadence. It starts a deprecation cycle for a renamed argument (`cdf_cutoff` becomes `cdf_max`) and adds a coercion generic that the next CRAN release of EpiNow2 needs, allowing EpiNow2 to depend on the CRAN version of distspec. We apologise for the quick succession and expect future releases to follow the usual cadence.
