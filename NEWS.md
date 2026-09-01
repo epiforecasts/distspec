@@ -2,11 +2,7 @@
 
 ## New features
 
-- Added `as_dist_spec()`, a generic for converting other representations of a
-  probability distribution to a `<dist_spec>`: a `<dist_spec>` is returned
-  unchanged, a numeric PMF vector becomes a `NonParametric()` and a single
-  number a `Fixed()`. Other packages can register methods for their own
-  classes without a dependency in either direction.
+- Added `as_dist_spec()`, a generic for converting other representations of a probability distribution to a `<dist_spec>`: a `<dist_spec>` is returned unchanged, a numeric PMF vector becomes a `NonParametric()` and a single number a `Fixed()`. Other packages can register methods for their own classes without a dependency in either direction.
 
 ## Deprecations
 
@@ -23,15 +19,9 @@
 
 ## Bug fixes
 
-- `Fixed()` now forwards its `...` to `bound_dist()` as documented; previously
-  limits such as `Fixed(3, max = 5)` were silently dropped.
-- A non-finite `Fixed()` value (e.g. `NA` or `Inf`) is now rejected with an
-  informative error; previously it raised a bare condition error from the
-  internal bound check.
-- Bounding a fixed distribution below its value (e.g. `Fixed(6, max = 5)`) is
-  now rejected, and discretising a partially truncated fixed distribution
-  renormalises the PMF to sum to one; previously both silently produced an
-  invalid PMF.
+- `Fixed()` now forwards its `...` to `bound_dist()` as documented; previously limits such as `Fixed(3, max = 5)` were silently dropped.
+- A non-finite `Fixed()` value (e.g. `NA` or `Inf`) is now rejected with an informative error; previously it raised a bare condition error from the internal bound check.
+- Bounding a fixed distribution below its value (e.g. `Fixed(6, max = 5)`) is now rejected, and discretising a partially truncated fixed distribution renormalises the PMF to sum to one; previously both silently produced an invalid PMF.
 
 ## Documentation
 
