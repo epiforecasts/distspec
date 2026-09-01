@@ -22,20 +22,11 @@ probability mass function. The PMF can instead be left uncertain by
 passing a \code{\link[=Dirichlet]{Dirichlet()}} prior.
 }
 \details{
-The constructed \verb{<dist_spec>} stores the PMF in its \code{pmf} element, whose
-content mirrors how every other distribution stores an uncertain parameter:
-for a fixed distribution it is a numeric vector (the normalised PMF), and
-for an uncertain one it is the \code{\link[=Dirichlet]{Dirichlet()}} prior itself, as a
-\verb{<dist_spec>}. Just as \code{Gamma(shape = Normal(3, 0.5), rate = 2)} holds a
-\verb{<dist_spec>} in its \code{shape} parameter, an uncertain nonparametric
-distribution holds its prior in place of a concrete PMF, and has no PMF
-until the prior is resolved.
-
-Code inspecting a distribution should use the accessors rather than reading
-the element directly: \code{\link[=get_pmf]{get_pmf()}} returns the PMF of a fixed nonparametric
-distribution and errors for an uncertain one, \code{\link[=has_uncertainty]{has_uncertainty()}} reports
-whether a prior is present, and \code{\link[=fix_parameters]{fix_parameters()}} resolves the prior to a
-fixed PMF (e.g. with \code{strategy = "mean"}).
+A distribution constructed with a \code{\link[=Dirichlet]{Dirichlet()}} prior carries the prior in
+place of a concrete PMF, just as \code{Gamma(shape = Normal(3, 0.5), rate = 2)}
+carries a prior in its \code{shape} parameter. Use \code{\link[=fix_parameters]{fix_parameters()}} to resolve
+the prior into a PMF (e.g. with \code{strategy = "mean"}); until then
+\code{\link[=get_pmf]{get_pmf()}} errors and \code{\link[=has_uncertainty]{has_uncertainty()}} returns \code{TRUE}.
 }
 \examples{
 NonParametric(c(0.1, 0.3, 0.2, 0.4))

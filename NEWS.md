@@ -16,12 +16,11 @@
 ## Documentation
 
 - Added a hex sticker logo, shown in the README and on the pkgdown site.
-- The `NonParametric()` help page now documents how the PMF is stored: a
-  numeric vector for a fixed distribution and the `Dirichlet()` prior as a
-  `<dist_spec>` for an uncertain one, mirroring how uncertain parameters are
-  stored elsewhere, with `get_pmf()`, `has_uncertainty()` and
-  `fix_parameters()` as the supported ways to inspect and resolve it.
-  `has_uncertainty()` now appears in the reference index to match.
+- The `NonParametric()` help page now documents that a distribution
+  constructed with a `Dirichlet()` prior carries the prior in place of a
+  concrete PMF, and how to work with it using `fix_parameters()`,
+  `get_pmf()` and `has_uncertainty()`. `has_uncertainty()` now appears in
+  the reference index to match.
 
 # distspec 0.1.0
 
