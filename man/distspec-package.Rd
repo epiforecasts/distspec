@@ -14,6 +14,7 @@ Represents probability distributions with fixed or potentially uncertain paramet
 Useful links:
 \itemize{
   \item \url{https://epiforecasts.io/distspec/}
+  \item \url{https://github.com/epiforecasts/distspec}
   \item Report bugs at \url{https://github.com/epiforecasts/distspec/issues}
 }
 
