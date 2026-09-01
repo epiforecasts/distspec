@@ -25,6 +25,7 @@ reference:
       - NonParametric
       - Dirichlet
       - new_dist_spec
+      - as_dist_spec
   - title: Access properties
     desc: Extract the type, parameters or probability mass function of a
       distribution.

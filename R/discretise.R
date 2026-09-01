@@ -291,6 +291,21 @@ bound_dist <- function(x, max = Inf, cdf_max = 1, cdf_cutoff = deprecated()) {
       )
     )
   }
+  ## a point mass has no tail to trim: a `max` this tight would drop all of
+  ## its probability mass when discretised (discretisation with a given `max`
+  ## covers the bins up to `ceiling(max) - 1`, so the value's bin must lie at
+  ## or below that), so reject it at construction
+  if (ndist(x) == 1 && get_distribution(x) == "fixed" &&
+        is.numeric(x$parameters$value) &&
+        ceiling(max) <= floor(x$parameters$value)) {
+    cli_abort(
+      c(
+        "!" = "{.arg max} ({max}) is too small for the fixed value
+        ({x$parameters$value}): discretising would drop all probability mass.",
+        "i" = "Set {.arg max} to at least {floor(x$parameters$value) + 1}."
+      )
+    )
+  }
   ## if it is a single fixed-PMF nonparametric distribution we apply the bounds
   ## directly; an uncertain one has no PMF, so it keeps the attribute-based path
   if (ndist(x) == 1 && get_distribution(x) == "nonparametric" &&

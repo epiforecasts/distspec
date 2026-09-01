@@ -20,12 +20,20 @@
 #' Fixed(value = 3.5)
 Fixed <- function(value, ...) {
   params <- as.list(environment())
-  new_dist_spec(params, "fixed")
+  new_dist_spec(params, "fixed", ...)
 }
 
 # Validate a fixed `value` against its lower bound. An uncertain (non-numeric)
 # value is bound-checked when sampled rather than here.
 validate_fixed_value <- function(value) {
+  if (is.numeric(value) && any(!is.finite(value))) {
+    cli_abort(
+      c(
+        "!" = "Parameter {.arg value} must be a finite number.",
+        "i" = "It is {.val {value}}."
+      )
+    )
+  }
   lb <- lower_bounds(dist_prototype("fixed"))[["value"]]
   if (is.numeric(value) && any(value < lb)) {
     cli_abort(
@@ -86,5 +94,17 @@ discrete_pmf.fixed <- function(x, max_value, ...) {
       }
     }
   }
-  pmf
+  ## truncating at `max_value` can drop some or all of the point mass; drop
+  ## and renormalise per the bound contract, and error if nothing remains
+  total <- sum(pmf)
+  if (total == 0) {
+    cli_abort(
+      c(
+        "!" = "Discretising this fixed distribution (value {value}) leaves no
+        probability mass below {.arg max} = {max_value}.",
+        "i" = "Set {.arg max} to at least {ceiling(value) + 1}."
+      )
+    )
+  }
+  pmf / total
 }
