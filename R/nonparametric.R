@@ -18,11 +18,11 @@
 #'   [Dirichlet()]). A numeric vector is normalised to sum to one.
 #' @param ... Limits of the distribution, passed to [bound_dist()].
 #' @details
-#' A distribution constructed with a [Dirichlet()] prior carries the prior in
-#' place of a concrete PMF, just as `Gamma(shape = Normal(3, 0.5), rate = 2)`
-#' carries a prior in its `shape` parameter. Use [fix_parameters()] to resolve
-#' the prior into a PMF (e.g. with `strategy = "mean"`); until then
-#' [get_pmf()] errors and [has_uncertainty()] returns `TRUE`.
+#' A distribution constructed with a [Dirichlet()] prior has no concrete PMF,
+#' in the same way that `Gamma(shape = Normal(3, 0.5), rate = 2)` has an
+#' uncertain `shape` in place of a fixed value. [get_pmf()] errors and
+#' [has_uncertainty()] returns `TRUE` until [fix_parameters()] resolves the
+#' prior into a PMF (e.g. with `strategy = "mean"`).
 #' @return A `<dist_spec>`.
 #' @seealso [Distributions] for an overview and the other distributions.
 #' @export

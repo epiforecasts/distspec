@@ -22,11 +22,11 @@ probability mass function. The PMF can instead be left uncertain by
 passing a \code{\link[=Dirichlet]{Dirichlet()}} prior.
 }
 \details{
-A distribution constructed with a \code{\link[=Dirichlet]{Dirichlet()}} prior carries the prior in
-place of a concrete PMF, just as \code{Gamma(shape = Normal(3, 0.5), rate = 2)}
-carries a prior in its \code{shape} parameter. Use \code{\link[=fix_parameters]{fix_parameters()}} to resolve
-the prior into a PMF (e.g. with \code{strategy = "mean"}); until then
-\code{\link[=get_pmf]{get_pmf()}} errors and \code{\link[=has_uncertainty]{has_uncertainty()}} returns \code{TRUE}.
+A distribution constructed with a \code{\link[=Dirichlet]{Dirichlet()}} prior has no concrete PMF,
+in the same way that \code{Gamma(shape = Normal(3, 0.5), rate = 2)} has an
+uncertain \code{shape} in place of a fixed value. \code{\link[=get_pmf]{get_pmf()}} errors and
+\code{\link[=has_uncertainty]{has_uncertainty()}} returns \code{TRUE} until \code{\link[=fix_parameters]{fix_parameters()}} resolves the
+prior into a PMF (e.g. with \code{strategy = "mean"}).
 }
 \examples{
 NonParametric(c(0.1, 0.3, 0.2, 0.4))
