@@ -16,6 +16,7 @@
 ## Documentation
 
 - Added a hex sticker logo, shown in the README and on the pkgdown site.
+- The `NonParametric()` help page now documents that a distribution constructed with a `Dirichlet()` prior has no concrete PMF until `fix_parameters()` resolves it, and how `get_pmf()` and `has_uncertainty()` behave in the meantime. `has_uncertainty()` now appears in the reference index to match.
 
 # distspec 0.1.0
 

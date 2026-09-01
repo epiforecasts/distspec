@@ -179,7 +179,6 @@ get_pmf <- function(x, id = NULL) {
 ##'
 ##' @inheritParams get_element
 ##' @return `TRUE` if the (component) distribution is uncertain.
-##' @keywords internal
 ##' @export
 ##' @examples
 ##' has_uncertainty(Gamma(shape = 1, rate = 1))
