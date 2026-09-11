@@ -173,6 +173,59 @@ test_that("sample_dist errors instead of hanging for an unreachable composite bo
   expect_error(sample_dist(composite, 10), "attempts")
 })
 
+test_that("sample_dist round-trips with dist_cdf for unbounded distributions", {
+  ## for a continuous distribution X, F(X) is Uniform(0, 1); this checks
+  ## sample_dist() against dist_cdf() (and, for Beta(), pbeta()) independently
+  ## of any particular parameterisation
+  set.seed(1)
+  n <- 2000
+  dists <- list(
+    Gamma(shape = 2, rate = 1),
+    LogNormal(meanlog = 1, sdlog = 0.5),
+    Normal(mean = 5, sd = 2),
+    Weibull(shape = 2, scale = 3),
+    Exponential(rate = 0.5)
+  )
+  for (dist in dists) {
+    samples <- sample_dist(dist, n)
+    cdf <- dist_cdf(dist)
+    u <- do.call(cdf, c(list(samples), get_parameters(dist)))
+    expect_gt(ks.test(u, "punif")$p.value, 0.001)
+  }
+  ## Beta() has no dist_cdf() method, so is paired with pbeta() directly
+  beta <- Beta(shape1 = 2, shape2 = 5)
+  u <- pbeta(sample_dist(beta, n), shape1 = 2, shape2 = 5)
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with dist_cdf for a `max`-bounded distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- Gamma(shape = 2, rate = 1, max = 3)
+  samples <- sample_dist(dist, n)
+  upper_cdf <- pgamma(3, shape = 2, rate = 1)
+  u <- pgamma(samples, shape = 2, rate = 1) / upper_cdf
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with dist_cdf for a `cdf_max`-bounded distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- bound_dist(Weibull(shape = 2, scale = 3), cdf_max = 0.9)
+  samples <- sample_dist(dist, n)
+  u <- pweibull(samples, shape = 2, scale = 3) / 0.9
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with pbeta for a `cdf_max`-bounded beta distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- bound_dist(Beta(shape1 = 2, shape2 = 5), cdf_max = 0.9)
+  samples <- sample_dist(dist, n)
+  u <- pbeta(samples, shape1 = 2, shape2 = 5) / 0.9
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
 test_that("sample_dist validates n", {
   expect_error(sample_dist(Fixed(3), -1), "non-negative")
   expect_error(sample_dist(Fixed(3), c(1, 2)), "single")
