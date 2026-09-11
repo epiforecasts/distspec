@@ -322,7 +322,10 @@ sd.default <- function(x, ...) {
 #' A composite (multi-component) distribution is sampled per component, in
 #' keeping with `mean()`/`sd()`, which also return one value per component. Use
 #' `rowSums()` on the result to obtain samples of the combined (convolved)
-#' distribution.
+#' distribution. If the composite itself carries a `max`/`cdf_max` (set with
+#' [bound_dist()] on the sum, rather than on an individual component), this
+#' bounds the row sums: rows that violate it are redrawn, since there is no
+#' closed-form CDF for an arbitrary sum to invert exactly.
 #'
 #' @param x A `<dist_spec>`.
 #' @param n The number of samples to draw.
@@ -379,12 +382,82 @@ sample_dist.uncertain_dist_spec <- function(x, n, ...) {
 }
 
 #' @rdname sample_dist
+#' @importFrom stats quantile
+#' @importFrom rlang `%||%`
 #' @export
 sample_dist.multi_dist_spec <- function(x, n, ...) {
   ## An uncertain component errors via its own
   ## `sample_dist.uncertain_dist_spec()` method. Each component carries its
-  ## own `max`/`cdf_max`, so this respects them per component.
-  vapply(x, sample_dist, numeric(n), n = n)
+  ## own `max`/`cdf_max`, respected by its own `sample_dist()` method.
+  samples <- draw_components(x, n)
+  ## the composite itself can carry a `max`/`cdf_max` of its own (set with
+  ## `bound_dist()` on the sum, e.g. `bound_dist(dist1 + dist2, max = 20)`),
+  ## which bounds the convolved (row-summed) distribution; enforce it by
+  ## resampling rows that violate it.
+  max_value <- attr(x, "max") %||% Inf
+  cdf_max <- attr(x, "cdf_max") %||% 1
+  if (is.infinite(max_value) && cdf_max == 1) {
+    return(samples)
+  }
+  if (cdf_max < 1) {
+    ## there is no closed-form CDF for an arbitrary sum of components, so the
+    ## `cdf_max` quantile of the convolved distribution is estimated from a
+    ## reference sample rather than computed exactly
+    reference <- rowSums(draw_components(x, max(n, 1e4)))
+    reference_quantile <- quantile(reference, probs = cdf_max, names = FALSE)
+    max_value <- min(max_value, reference_quantile)
+  }
+  resample_bounded_rows(x, samples, max_value)
+}
+
+#' Draw an `n` by `k` matrix of per-component samples
+#'
+#' @description
+#' A thin wrapper around `vapply()` that always returns a matrix, even when
+#' `n = 1` (where `vapply()` would otherwise simplify to a plain vector).
+#' @param x A `<multi_dist_spec>`.
+#' @param n The number of samples to draw.
+#' @return An `n` by `length(x)` matrix.
+#' @keywords internal
+draw_components <- function(x, n) {
+  samples <- vapply(x, sample_dist, numeric(n), n = n)
+  if (n == 1) matrix(samples, nrow = 1) else samples
+}
+
+#' Resample rows of a composite sample matrix that violate a row-sum bound
+#'
+#' @description
+#' Used by `sample_dist.multi_dist_spec()` to enforce a `max`/`cdf_max` set on
+#' the composite itself. There is no closed-form CDF for an arbitrary sum of
+#' components, so this redraws every component of each violating row until its
+#' sum satisfies the bound, capped at `max_attempts` rounds so a bound that is
+#' effectively unreachable errors instead of hanging.
+#' @param x A `<multi_dist_spec>`.
+#' @param samples The `n` by `k` matrix of per-component samples to fix up.
+#' @param max_value The upper bound on `rowSums(samples)`.
+#' @param max_attempts The maximum number of resampling rounds.
+#' @importFrom cli cli_abort
+#' @keywords internal
+resample_bounded_rows <- function(x, samples, max_value, max_attempts = 100) {
+  violating <- which(rowSums(samples) > max_value)
+  attempts <- 0
+  while (length(violating) > 0 && attempts < max_attempts) {
+    replacement <- draw_components(x, length(violating))
+    samples[violating, ] <- replacement
+    violating <- violating[rowSums(replacement) > max_value]
+    attempts <- attempts + 1
+  }
+  if (length(violating) > 0) {
+    cli_abort(
+      c(
+        "!" = "Could not draw samples satisfying the composite {.arg max}/
+        {.arg cdf_max} bound after {max_attempts} attempts.",
+        "i" = "The bound may cut off nearly all of the convolved
+        distribution's mass; consider a looser bound."
+      )
+    )
+  }
+  samples
 }
 
 #' Draw samples respecting a `max`/`cdf_max` bound

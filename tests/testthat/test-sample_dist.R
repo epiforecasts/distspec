@@ -140,6 +140,39 @@ test_that("sample_dist respects bounds per component of a composite distribution
   expect_true(all(samples[, 2] <= 3))
 })
 
+test_that("sample_dist respects a `max` bound set on a composite as a whole", {
+  set.seed(1)
+  composite <- bound_dist(
+    Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1), max = 4
+  )
+  samples <- sample_dist(composite, 1000)
+  expect_true(all(rowSums(samples) <= 4))
+  ## the unbounded mean of the sum is 5, so the bound must be doing something
+  expect_true(mean(rowSums(samples)) < 5)
+})
+
+test_that("sample_dist respects a `cdf_max` bound set on a composite as a whole", {
+  set.seed(1)
+  composite <- Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1)
+  unbounded_totals <- rowSums(sample_dist(composite, 1e5))
+  cutoff <- quantile(unbounded_totals, probs = 0.9, names = FALSE)
+
+  bounded <- bound_dist(composite, cdf_max = 0.9)
+  samples <- sample_dist(bounded, 1000)
+  ## allow some slack: the cutoff above is itself only an estimate
+  expect_true(all(rowSums(samples) <= cutoff * 1.1))
+  expect_true(mean(rowSums(samples)) < mean(unbounded_totals))
+})
+
+test_that("sample_dist errors instead of hanging for an unreachable composite bound", {
+  set.seed(1)
+  ## the sum of two Normal(100, 1) has virtually no mass below 90
+  composite <- bound_dist(
+    Normal(mean = 100, sd = 1) + Normal(mean = 100, sd = 1), max = 90
+  )
+  expect_error(sample_dist(composite, 10), "attempts")
+})
+
 test_that("sample_dist validates n", {
   expect_error(sample_dist(Fixed(3), -1), "non-negative")
   expect_error(sample_dist(Fixed(3), c(1, 2)), "single")
