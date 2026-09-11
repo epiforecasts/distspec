@@ -87,6 +87,59 @@ test_that("sample_dist of a composite errors if a component is uncertain", {
   expect_error(sample_dist(composite, 10), "fixed parameters")
 })
 
+test_that("sample_dist respects the `max` bound", {
+  set.seed(1)
+  dist <- LogNormal(meanlog = 1.8, sdlog = 0.5, max = 10)
+  samples <- sample_dist(dist, 1000)
+  expect_true(all(samples <= 10))
+})
+
+test_that("sample_dist respects the `cdf_max` bound", {
+  set.seed(1)
+  dist <- bound_dist(Gamma(shape = 2, rate = 1), cdf_max = 0.9)
+  samples <- sample_dist(dist, 1000)
+  cutoff <- qgamma(0.9, shape = 2, rate = 1)
+  expect_true(all(samples <= cutoff))
+})
+
+test_that("sample_dist matches the truncated distribution's mean", {
+  set.seed(1)
+  n <- 1e5
+  dist <- Gamma(shape = 2, rate = 1, max = 3)
+  samples <- sample_dist(dist, n)
+  expect_true(all(samples <= 3))
+  truncated_mean <- integrate(function(x) x * dgamma(x, 2, 1), 0, 3)$value /
+    pgamma(3, 2, 1)
+  expect_equal(mean(samples), truncated_mean, tolerance = 0.02)
+})
+
+test_that("sample_dist doesn't hang for a bound deep in the tail", {
+  ## the tail of Normal(100, 1) beyond 90 has probability ~1e-24: a rejection
+  ## loop would need ~1e24 draws on average and never finish
+  set.seed(1)
+  dist <- Normal(mean = 100, sd = 1, max = 90)
+  samples <- sample_dist(dist, 100)
+  expect_length(samples, 100)
+  expect_true(all(samples <= 90))
+})
+
+test_that("sample_dist respects `cdf_max` for a beta distribution", {
+  set.seed(1)
+  dist <- bound_dist(Beta(shape1 = 2, shape2 = 5), cdf_max = 0.9)
+  samples <- sample_dist(dist, 1000)
+  cutoff <- qbeta(0.9, shape1 = 2, shape2 = 5)
+  expect_true(all(samples <= cutoff))
+})
+
+test_that("sample_dist respects bounds per component of a composite distribution", {
+  set.seed(1)
+  composite <- LogNormal(meanlog = 1.8, sdlog = 0.5, max = 10) +
+    Exponential(rate = 1, max = 3)
+  samples <- sample_dist(composite, 1000)
+  expect_true(all(samples[, 1] <= 10))
+  expect_true(all(samples[, 2] <= 3))
+})
+
 test_that("sample_dist validates n", {
   expect_error(sample_dist(Fixed(3), -1), "non-negative")
   expect_error(sample_dist(Fixed(3), c(1, 2)), "single")
