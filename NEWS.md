@@ -1,5 +1,9 @@
 # distspec (development version)
 
+## Bug fixes
+
+- `sample_dist()` now respects a distribution's `max` and `cdf_max` bounds instead of sampling from the unbounded distribution; samples are drawn exactly via inverse-CDF sampling on the truncated range. This also fixes bounded sampling of a component within a composite (multi-`dist_spec`) distribution, lets `cdf_max` apply to `Beta()`, and respects a `max`/`cdf_max` set on a composite as a whole (bounding the convolved, row-summed, distribution) by resampling rows that violate it.
+
 # distspec 0.2.0
 
 ## New features
