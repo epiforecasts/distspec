@@ -382,8 +382,47 @@ sample_dist.uncertain_dist_spec <- function(x, n, ...) {
 #' @export
 sample_dist.multi_dist_spec <- function(x, n, ...) {
   ## An uncertain component errors via its own
-  ## `sample_dist.uncertain_dist_spec()` method.
+  ## `sample_dist.uncertain_dist_spec()` method. Each component carries its
+  ## own `max`/`cdf_max`, so this respects them per component.
   vapply(x, sample_dist, numeric(n), n = n)
+}
+
+#' Draw samples respecting a `max`/`cdf_max` bound
+#'
+#' @description
+#' Used by each parametric distribution's `sample_dist()` method. If `x` is
+#' unconstrained this just calls the unbounded generator `rng`. Otherwise it
+#' draws exactly from the bounded distribution via inverse-CDF sampling:
+#' `upper` is the smaller of `max` and the `cdf_max` quantile, `u` is drawn
+#' uniformly on `(0, F(upper))`, and the quantile at `u` is returned. This
+#' takes a single pass, unlike a rejection loop (resampling from the unbounded
+#' distribution until a draw falls within the bound), which can hang when the
+#' bound cuts off nearly all of the mass (e.g. `Normal(mean = 100, sd = 1,
+#' max = 90)`, whose tail beyond 90 has probability of order 1e-24).
+#'
+#' @param x A single (non-composite) `<dist_spec>`.
+#' @param n The number of samples to draw.
+#' @param rng The base-R random-generation function for the family (e.g.
+#'   [rgamma()]).
+#' @param cdf The base-R CDF function for the family (e.g. [pgamma()]).
+#' @param quantile The base-R quantile function for the family (e.g.
+#'   [qgamma()]).
+#' @return A numeric vector of `n` samples.
+#' @importFrom stats runif
+#' @importFrom rlang `%||%`
+#' @keywords internal
+sample_bounded <- function(x, n, rng, cdf, quantile) {
+  params <- get_parameters(x)
+  if (!is_constrained(x)) {
+    return(do.call(rng, c(list(n), params)))
+  }
+  upper_cdf <- attr(x, "cdf_max") %||% 1
+  max_value <- attr(x, "max") %||% Inf
+  if (is.finite(max_value)) {
+    upper_cdf <- min(upper_cdf, do.call(cdf, c(list(max_value), params)))
+  }
+  u <- runif(n, min = 0, max = upper_cdf)
+  do.call(quantile, c(list(u), params))
 }
 
 #' Returns the maximum of one or more delay distribution

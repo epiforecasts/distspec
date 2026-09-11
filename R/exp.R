@@ -53,8 +53,8 @@ mean.exp <- function(x, ...) 1 / x$parameters$rate
 #' @export
 sd.exp <- function(x, ...) 1 / x$parameters$rate
 
-#' @importFrom stats rexp
+#' @importFrom stats rexp qexp
 #' @exportS3Method
 sample_dist.exp <- function(x, n, ...) {
-  rexp(n, rate = x$parameters$rate)
+  sample_bounded(x, n, rng = rexp, cdf = pexp, quantile = qexp)
 }
