@@ -310,10 +310,15 @@ sd.default <- function(x, ...) {
 #' Sample from a distribution
 #'
 #' @description
-#' Draws random samples from a `<dist_spec>` whose parameters are fixed numbers,
-#' using the base-R random-generation function for its family (e.g. [rgamma()]
-#' for a gamma distribution). A discretised distribution is sampled on its
-#' integer support.
+#' Draws random samples from a `<dist_spec>` whose parameters are fixed
+#' numbers. An unbounded distribution uses the base-R random-generation
+#' function for its family (e.g. [rgamma()] for a gamma distribution). A
+#' discretised distribution is sampled on its integer support.
+#'
+#' A `max`/`cdf_max` set with [bound_dist()] on a parametric distribution is
+#' respected: samples are drawn from the truncated distribution by inverse
+#' CDF rather than by discarding draws beyond the bound, so the cost does not
+#' depend on how much of the mass the bound cuts off.
 #'
 #' Only distributions with fixed parameters can be sampled. If any parameter is
 #' itself a distribution (a prior), there is no single distribution to sample
@@ -322,7 +327,11 @@ sd.default <- function(x, ...) {
 #' A composite (multi-component) distribution is sampled per component, in
 #' keeping with `mean()`/`sd()`, which also return one value per component. Use
 #' `rowSums()` on the result to obtain samples of the combined (convolved)
-#' distribution.
+#' distribution. A `max`/`cdf_max` set on the composite itself (with
+#' [bound_dist()] on the sum) refers to that combined distribution, which has
+#' no closed-form distribution to draw from, so sampling such a composite
+#' raises an error. Bound the components individually to sample them under a
+#' bound.
 #'
 #' @param x A `<dist_spec>`.
 #' @param n The number of samples to draw.
@@ -379,11 +388,93 @@ sample_dist.uncertain_dist_spec <- function(x, n, ...) {
 }
 
 #' @rdname sample_dist
+#' @importFrom rlang `%||%`
+#' @importFrom cli cli_abort
 #' @export
 sample_dist.multi_dist_spec <- function(x, n, ...) {
   ## An uncertain component errors via its own
-  ## `sample_dist.uncertain_dist_spec()` method.
-  vapply(x, sample_dist, numeric(n), n = n)
+  ## `sample_dist.uncertain_dist_spec()` method. Each component carries its
+  ## own `max`/`cdf_max`, respected by its own `sample_dist()` method.
+  ## A bound on the composite itself (set with `bound_dist()` on the sum, e.g.
+  ## `bound_dist(dist1 + dist2, max = 20)`) constrains the convolved
+  ## (row-summed) distribution, which has no closed-form CDF to sample from.
+  max_value <- attr(x, "max") %||% Inf
+  cdf_max <- attr(x, "cdf_max") %||% 1
+  if (!is.infinite(max_value) || cdf_max < 1) {
+    cli_abort(
+      c(
+        "!" = "Can't sample from a composite distribution with a {.arg max} or
+        {.arg cdf_max} bound of its own.",
+        "i" = "The bound refers to the sum of the components, which has no
+        closed-form distribution to sample from.",
+        "i" = "Bound the components individually to sample them under a bound."
+      )
+    )
+  }
+  draw_components(x, n)
+}
+
+#' Draw an `n` by `k` matrix of per-component samples
+#'
+#' @description
+#' A thin wrapper around `vapply()` that always returns a matrix, even when
+#' `n = 1` (where `vapply()` would otherwise simplify to a plain vector).
+#' @param x A `<multi_dist_spec>`.
+#' @param n The number of samples to draw.
+#' @return An `n` by `length(x)` matrix.
+#' @keywords internal
+draw_components <- function(x, n) {
+  samples <- vapply(x, sample_dist, numeric(n), n = n)
+  if (n == 1) matrix(samples, nrow = 1) else samples
+}
+
+#' Draw samples respecting a `max`/`cdf_max` bound
+#'
+#' @description
+#' Used by each parametric distribution's `sample_dist()` method. If `x` is
+#' unconstrained this just calls the unbounded generator `rng`. Otherwise it
+#' draws exactly from the bounded distribution via inverse-CDF sampling:
+#' `upper` is the smaller of `max` and the `cdf_max` quantile, `u` is drawn
+#' uniformly on `(0, F(upper))`, and the quantile at `u` is returned. This
+#' takes a single pass, unlike a rejection loop (resampling from the unbounded
+#' distribution until a draw falls within the bound), which can hang when the
+#' bound cuts off nearly all of the mass (e.g. `Normal(mean = 100, sd = 1,
+#' max = 90)`, whose tail beyond 90 has probability of order 1e-24).
+#'
+#' The computation runs on the log scale throughout, so a bound far enough
+#' into the lower tail for `F(upper)` to underflow to zero in double precision
+#' (e.g. `Normal(mean = 100, sd = 1, max = 20)`) still samples correctly.
+#'
+#' @param x A single (non-composite) `<dist_spec>`.
+#' @param n The number of samples to draw.
+#' @param rng The base-R random-generation function for the family (e.g.
+#'   [rgamma()]).
+#' @param cdf The base-R CDF function for the family (e.g. [pgamma()]).
+#' @param quantile The base-R quantile function for the family (e.g.
+#'   [qgamma()]).
+#' @return A numeric vector of `n` samples.
+#' @importFrom stats runif
+#' @importFrom rlang `%||%`
+#' @keywords internal
+sample_bounded <- function(x, n, rng, cdf, quantile) {
+  params <- get_parameters(x)
+  if (!is_constrained(x)) {
+    return(do.call(rng, c(list(n), params)))
+  }
+  ## everything is done on the log scale: for a bound deep in the lower tail
+  ## `F(max)` underflows to 0 in double precision (e.g. `pnorm(20, 100, 1)`),
+  ## which would collapse every draw onto the support boundary
+  log_upper <- log(attr(x, "cdf_max") %||% 1)
+  max_value <- attr(x, "max") %||% Inf
+  if (is.finite(max_value)) {
+    log_upper <- min(
+      log_upper,
+      do.call(cdf, c(list(max_value), params, list(log.p = TRUE)))
+    )
+  }
+  ## u is uniform on (0, F(upper)); log(u) = log F(upper) + log(uniform)
+  log_u <- log_upper + log(runif(n))
+  do.call(quantile, c(list(log_u), params, list(log.p = TRUE)))
 }
 
 #' Returns the maximum of one or more delay distribution

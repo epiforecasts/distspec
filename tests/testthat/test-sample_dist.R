@@ -81,10 +81,165 @@ test_that("sample_dist of a composite returns an n-by-k matrix of components", {
   expect_equal(mean(rowSums(samples)), 5, tolerance = 0.05)
 })
 
+test_that("sample_dist of a composite returns a matrix even for n = 1", {
+  set.seed(1)
+  composite <- Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1)
+  samples <- sample_dist(composite, 1)
+  expect_true(is.matrix(samples))
+  expect_identical(dim(samples), c(1L, 2L))
+  ## the documented `rowSums()` idiom works at every `n`
+  expect_length(rowSums(samples), 1)
+})
+
 test_that("sample_dist of a composite errors if a component is uncertain", {
   composite <- Gamma(shape = 2, rate = 1) +
     LogNormal(meanlog = Normal(3, 0.5), sdlog = 1)
   expect_error(sample_dist(composite, 10), "fixed parameters")
+})
+
+test_that("sample_dist respects the `max` bound", {
+  set.seed(1)
+  dist <- LogNormal(meanlog = 1.8, sdlog = 0.5, max = 10)
+  samples <- sample_dist(dist, 1000)
+  expect_true(all(samples <= 10))
+})
+
+test_that("sample_dist respects the `cdf_max` bound", {
+  set.seed(1)
+  dist <- bound_dist(Gamma(shape = 2, rate = 1), cdf_max = 0.9)
+  samples <- sample_dist(dist, 1000)
+  cutoff <- qgamma(0.9, shape = 2, rate = 1)
+  expect_true(all(samples <= cutoff))
+})
+
+test_that("sample_dist matches the truncated distribution's mean", {
+  set.seed(1)
+  n <- 1e5
+  dist <- Gamma(shape = 2, rate = 1, max = 3)
+  samples <- sample_dist(dist, n)
+  expect_true(all(samples <= 3))
+  truncated_mean <- integrate(function(x) x * dgamma(x, 2, 1), 0, 3)$value /
+    pgamma(3, 2, 1)
+  expect_equal(mean(samples), truncated_mean, tolerance = 0.02)
+})
+
+test_that("sample_dist applies the tighter of `max` and `cdf_max`", {
+  set.seed(1)
+  ## `max` binds: it sits below the `cdf_max` quantile
+  max_binds <- bound_dist(Gamma(shape = 2, rate = 1, max = 3), cdf_max = 0.99)
+  expect_true(all(sample_dist(max_binds, 500) <= 3))
+  ## `cdf_max` binds: its quantile sits below `max`
+  cdf_binds <- bound_dist(Gamma(shape = 2, rate = 1, max = 10), cdf_max = 0.8)
+  expect_true(all(sample_dist(cdf_binds, 500) <= qgamma(0.8, 2, 1)))
+})
+
+test_that("sample_dist doesn't hang for a bound deep in the tail", {
+  ## the tail of Normal(100, 1) beyond 90 has probability ~1e-24: a rejection
+  ## loop would need ~1e24 draws on average and never finish
+  set.seed(1)
+  dist <- Normal(mean = 100, sd = 1, max = 90)
+  samples <- sample_dist(dist, 100)
+  expect_length(samples, 100)
+  expect_true(all(samples <= 90))
+})
+
+test_that("sample_dist handles a bound whose CDF underflows to zero", {
+  ## `pnorm(20, 100, 1)` is 0 in double precision, so sampling on the natural
+  ## scale would collapse every draw onto the support boundary (-Inf here)
+  set.seed(1)
+  samples <- sample_dist(Normal(mean = 100, sd = 1, max = 20), 100)
+  expect_true(all(is.finite(samples)))
+  expect_true(all(samples <= 20))
+  ## the same on a support bounded below, where the boundary is 0
+  gamma_samples <- sample_dist(Gamma(shape = 200, rate = 1, max = 0.02), 100)
+  expect_true(all(gamma_samples > 0))
+  expect_true(all(gamma_samples <= 0.02))
+})
+
+test_that("sample_dist respects `cdf_max` for a beta distribution", {
+  set.seed(1)
+  dist <- bound_dist(Beta(shape1 = 2, shape2 = 5), cdf_max = 0.9)
+  samples <- sample_dist(dist, 1000)
+  cutoff <- qbeta(0.9, shape1 = 2, shape2 = 5)
+  expect_true(all(samples <= cutoff))
+})
+
+test_that("sample_dist respects bounds per component of a composite distribution", {
+  set.seed(1)
+  composite <- LogNormal(meanlog = 1.8, sdlog = 0.5, max = 10) +
+    Exponential(rate = 1, max = 3)
+  samples <- sample_dist(composite, 1000)
+  expect_true(all(samples[, 1] <= 10))
+  expect_true(all(samples[, 2] <= 3))
+})
+
+test_that("sample_dist errors on a bound set on a composite as a whole", {
+  ## the bound constrains the sum, which has no closed-form distribution
+  max_bounded <- bound_dist(
+    Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1), max = 4
+  )
+  expect_error(sample_dist(max_bounded, 10), "bound of its own")
+  cdf_bounded <- bound_dist(
+    Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1), cdf_max = 0.9
+  )
+  expect_error(sample_dist(cdf_bounded, 10), "bound of its own")
+  ## a composite whose components are bounded individually still samples
+  per_component <- Gamma(shape = 2, rate = 1, max = 4) +
+    Gamma(shape = 3, rate = 1, max = 4)
+  expect_no_error(sample_dist(per_component, 10))
+})
+
+test_that("sample_dist round-trips with dist_cdf for unbounded distributions", {
+  ## for a continuous distribution X, F(X) is Uniform(0, 1); this checks
+  ## sample_dist() against dist_cdf() (and, for Beta(), pbeta()) independently
+  ## of any particular parameterisation
+  set.seed(1)
+  n <- 2000
+  dists <- list(
+    Gamma(shape = 2, rate = 1),
+    LogNormal(meanlog = 1, sdlog = 0.5),
+    Normal(mean = 5, sd = 2),
+    Weibull(shape = 2, scale = 3),
+    Exponential(rate = 0.5)
+  )
+  for (dist in dists) {
+    samples <- sample_dist(dist, n)
+    cdf <- dist_cdf(dist)
+    u <- do.call(cdf, c(list(samples), get_parameters(dist)))
+    expect_gt(ks.test(u, "punif")$p.value, 0.001)
+  }
+  ## Beta() has no dist_cdf() method, so is paired with pbeta() directly
+  beta <- Beta(shape1 = 2, shape2 = 5)
+  u <- pbeta(sample_dist(beta, n), shape1 = 2, shape2 = 5)
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with dist_cdf for a `max`-bounded distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- Gamma(shape = 2, rate = 1, max = 3)
+  samples <- sample_dist(dist, n)
+  upper_cdf <- pgamma(3, shape = 2, rate = 1)
+  u <- pgamma(samples, shape = 2, rate = 1) / upper_cdf
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with dist_cdf for a `cdf_max`-bounded distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- bound_dist(Weibull(shape = 2, scale = 3), cdf_max = 0.9)
+  samples <- sample_dist(dist, n)
+  u <- pweibull(samples, shape = 2, scale = 3) / 0.9
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
+})
+
+test_that("sample_dist round-trips with pbeta for a `cdf_max`-bounded beta distribution", {
+  set.seed(1)
+  n <- 2000
+  dist <- bound_dist(Beta(shape1 = 2, shape2 = 5), cdf_max = 0.9)
+  samples <- sample_dist(dist, n)
+  u <- pbeta(samples, shape1 = 2, shape2 = 5) / 0.9
+  expect_gt(ks.test(u, "punif")$p.value, 0.001)
 })
 
 test_that("sample_dist validates n", {
