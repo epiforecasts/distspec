@@ -81,6 +81,16 @@ test_that("sample_dist of a composite returns an n-by-k matrix of components", {
   expect_equal(mean(rowSums(samples)), 5, tolerance = 0.05)
 })
 
+test_that("sample_dist of a composite returns a matrix even for n = 1", {
+  set.seed(1)
+  composite <- Gamma(shape = 2, rate = 1) + Gamma(shape = 3, rate = 1)
+  samples <- sample_dist(composite, 1)
+  expect_true(is.matrix(samples))
+  expect_identical(dim(samples), c(1L, 2L))
+  ## the documented `rowSums()` idiom works at every `n`
+  expect_length(rowSums(samples), 1)
+})
+
 test_that("sample_dist of a composite errors if a component is uncertain", {
   composite <- Gamma(shape = 2, rate = 1) +
     LogNormal(meanlog = Normal(3, 0.5), sdlog = 1)
