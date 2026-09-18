@@ -123,6 +123,16 @@ test_that("sample_dist matches the truncated distribution's mean", {
   expect_equal(mean(samples), truncated_mean, tolerance = 0.02)
 })
 
+test_that("sample_dist applies the tighter of `max` and `cdf_max`", {
+  set.seed(1)
+  ## `max` binds: it sits below the `cdf_max` quantile
+  max_binds <- bound_dist(Gamma(shape = 2, rate = 1, max = 3), cdf_max = 0.99)
+  expect_true(all(sample_dist(max_binds, 500) <= 3))
+  ## `cdf_max` binds: its quantile sits below `max`
+  cdf_binds <- bound_dist(Gamma(shape = 2, rate = 1, max = 10), cdf_max = 0.8)
+  expect_true(all(sample_dist(cdf_binds, 500) <= qgamma(0.8, 2, 1)))
+})
+
 test_that("sample_dist doesn't hang for a bound deep in the tail", {
   ## the tail of Normal(100, 1) beyond 90 has probability ~1e-24: a rejection
   ## loop would need ~1e24 draws on average and never finish
