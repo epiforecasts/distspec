@@ -29,10 +29,11 @@ distspec 0.1.0 convention). A value in the historical EpiNow2 convention
 a \verb{<dist_spec>} with relevant attributes set that define its bounds
 }
 \description{
-Set the bounds that constrain a distribution when it is discretised: \code{max}
-truncates the support at that value, while \code{cdf_max} trims the tail by
-keeping the distribution only up to its \code{cdf_max} quantile. Either bound
-drops the mass beyond it and renormalises the remaining PMF to sum to one.
+Set the bounds that constrain a distribution: \code{max} truncates the support
+at that value, while \code{cdf_max} trims the tail by keeping the distribution
+only up to its \code{cdf_max} quantile. Either bound drops the mass beyond it
+and renormalises what remains. \code{\link[=discretise]{discretise()}} applies the bounds when
+producing a PMF, and \code{\link[=sample_dist]{sample_dist()}} draws from the bounded distribution.
 }
 \examples{
 # Truncate a gamma distribution at 20
@@ -41,5 +42,5 @@ bound_dist(Gamma(mean = 5, sd = 1), max = 20)
 bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 }
 \seealso{
-\code{\link[=discretise]{discretise()}}, which applies these bounds when producing a PMF.
+\code{\link[=discretise]{discretise()}} and \code{\link[=sample_dist]{sample_dist()}}, which apply these bounds.
 }

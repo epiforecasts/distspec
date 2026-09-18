@@ -26,10 +26,15 @@ of \code{n} samples per component (\code{rowSums()} gives \code{n} samples of th
 distribution).
 }
 \description{
-Draws random samples from a \verb{<dist_spec>} whose parameters are fixed numbers,
-using the base-R random-generation function for its family (e.g. \code{\link[=rgamma]{rgamma()}}
-for a gamma distribution). A discretised distribution is sampled on its
-integer support.
+Draws random samples from a \verb{<dist_spec>} whose parameters are fixed
+numbers. An unbounded distribution uses the base-R random-generation
+function for its family (e.g. \code{\link[=rgamma]{rgamma()}} for a gamma distribution). A
+discretised distribution is sampled on its integer support.
+
+A \code{max}/\code{cdf_max} set with \code{\link[=bound_dist]{bound_dist()}} is respected: samples are drawn
+from the truncated distribution, by inverse CDF rather than by discarding
+draws beyond the bound, so every draw falls within it and a bound far into
+the tail costs no more than an unbounded one.
 
 Only distributions with fixed parameters can be sampled. If any parameter is
 itself a distribution (a prior), there is no single distribution to sample
