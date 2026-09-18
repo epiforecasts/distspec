@@ -218,6 +218,9 @@ discretize <- discretise
 #' only up to its `cdf_max` quantile. Either bound drops the mass beyond it
 #' and renormalises what remains. [discretise()] applies the bounds when
 #' producing a PMF, and [sample_dist()] draws from the bounded distribution.
+#' A bound set on a composite distribution refers to the sum of its
+#' components: [sample_dist()] rejects such a bound, and [discretise()] does
+#' not apply it.
 #' @param x A `<dist_spec>`.
 #' @param max Numeric, maximum value of the distribution. The distribution will
 #' be truncated at this value. Default: `Inf`, i.e. no maximum.
@@ -236,7 +239,7 @@ discretize <- discretise
 #' @importFrom rlang `%||%` caller_env
 #' @importFrom lifecycle deprecated is_present deprecate_warn
 #' @return a `<dist_spec>` with relevant attributes set that define its bounds
-#' @seealso [discretise()] and [sample_dist()], which apply these bounds.
+#' @seealso [discretise()] and [sample_dist()], which consume these bounds.
 #' @export
 #' @examples
 #' # Truncate a gamma distribution at 20

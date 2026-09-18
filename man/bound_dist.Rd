@@ -34,6 +34,9 @@ at that value, while \code{cdf_max} trims the tail by keeping the distribution
 only up to its \code{cdf_max} quantile. Either bound drops the mass beyond it
 and renormalises what remains. \code{\link[=discretise]{discretise()}} applies the bounds when
 producing a PMF, and \code{\link[=sample_dist]{sample_dist()}} draws from the bounded distribution.
+A bound set on a composite distribution refers to the sum of its
+components: \code{\link[=sample_dist]{sample_dist()}} rejects such a bound, and \code{\link[=discretise]{discretise()}} does
+not apply it.
 }
 \examples{
 # Truncate a gamma distribution at 20
@@ -42,5 +45,5 @@ bound_dist(Gamma(mean = 5, sd = 1), max = 20)
 bound_dist(Gamma(mean = 5, sd = 1), cdf_max = 0.999)
 }
 \seealso{
-\code{\link[=discretise]{discretise()}} and \code{\link[=sample_dist]{sample_dist()}}, which apply these bounds.
+\code{\link[=discretise]{discretise()}} and \code{\link[=sample_dist]{sample_dist()}}, which consume these bounds.
 }
