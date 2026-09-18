@@ -323,10 +323,10 @@ sd.default <- function(x, ...) {
 #' keeping with `mean()`/`sd()`, which also return one value per component. Use
 #' `rowSums()` on the result to obtain samples of the combined (convolved)
 #' distribution. A `max`/`cdf_max` set on the composite itself (with
-#' [bound_dist()] on the sum) bounds the row sums, and sampling such a
-#' composite raises an error: the sum of the components has no closed-form
-#' distribution to draw from. Bound the components individually, or use
-#' [discretise()] to obtain the bounded probability mass function of the sum.
+#' [bound_dist()] on the sum) refers to that combined distribution, which has
+#' no closed-form distribution to draw from, so sampling such a composite
+#' raises an error. Bound the components individually to sample them under a
+#' bound.
 #'
 #' @param x A `<dist_spec>`.
 #' @param n The number of samples to draw.
@@ -400,10 +400,9 @@ sample_dist.multi_dist_spec <- function(x, n, ...) {
       c(
         "!" = "Can't sample from a composite distribution with a {.arg max} or
         {.arg cdf_max} bound of its own.",
-        "i" = "The bound constrains the sum of the components, which has no
+        "i" = "The bound refers to the sum of the components, which has no
         closed-form distribution to sample from.",
-        "i" = "Bound the components individually, or use {.fn discretise} to
-        obtain the bounded probability mass function of the sum."
+        "i" = "Bound the components individually to sample them under a bound."
       )
     )
   }

@@ -39,10 +39,10 @@ A composite (multi-component) distribution is sampled per component, in
 keeping with \code{mean()}/\code{sd()}, which also return one value per component. Use
 \code{rowSums()} on the result to obtain samples of the combined (convolved)
 distribution. A \code{max}/\code{cdf_max} set on the composite itself (with
-\code{\link[=bound_dist]{bound_dist()}} on the sum) bounds the row sums, and sampling such a
-composite raises an error: the sum of the components has no closed-form
-distribution to draw from. Bound the components individually, or use
-\code{\link[=discretise]{discretise()}} to obtain the bounded probability mass function of the sum.
+\code{\link[=bound_dist]{bound_dist()}} on the sum) refers to that combined distribution, which has
+no closed-form distribution to draw from, so sampling such a composite
+raises an error. Bound the components individually to sample them under a
+bound.
 }
 \examples{
 # Samples from a fixed gamma distribution
