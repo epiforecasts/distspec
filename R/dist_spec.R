@@ -322,10 +322,11 @@ sd.default <- function(x, ...) {
 #' A composite (multi-component) distribution is sampled per component, in
 #' keeping with `mean()`/`sd()`, which also return one value per component. Use
 #' `rowSums()` on the result to obtain samples of the combined (convolved)
-#' distribution. If the composite itself carries a `max`/`cdf_max` (set with
-#' [bound_dist()] on the sum, rather than on an individual component), this
-#' bounds the row sums: rows that violate it are redrawn, since there is no
-#' closed-form CDF for an arbitrary sum to invert exactly.
+#' distribution. A `max`/`cdf_max` set on the composite itself (with
+#' [bound_dist()] on the sum) bounds the row sums, and sampling such a
+#' composite raises an error: the sum of the components has no closed-form
+#' distribution to draw from. Bound the components individually, or use
+#' [discretise()] to obtain the bounded probability mass function of the sum.
 #'
 #' @param x A `<dist_spec>`.
 #' @param n The number of samples to draw.
