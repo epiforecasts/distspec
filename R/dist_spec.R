@@ -315,10 +315,10 @@ sd.default <- function(x, ...) {
 #' function for its family (e.g. [rgamma()] for a gamma distribution). A
 #' discretised distribution is sampled on its integer support.
 #'
-#' A `max`/`cdf_max` set with [bound_dist()] is respected: samples are drawn
-#' from the truncated distribution, by inverse CDF rather than by discarding
-#' draws beyond the bound, so every draw falls within it and a bound far into
-#' the tail costs no more than an unbounded one.
+#' A `max`/`cdf_max` set with [bound_dist()] on a parametric distribution is
+#' respected: samples are drawn from the truncated distribution by inverse
+#' CDF rather than by discarding draws beyond the bound, so the cost does not
+#' depend on how much of the mass the bound cuts off.
 #'
 #' Only distributions with fixed parameters can be sampled. If any parameter is
 #' itself a distribution (a prior), there is no single distribution to sample

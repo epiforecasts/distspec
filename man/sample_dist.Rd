@@ -31,10 +31,10 @@ numbers. An unbounded distribution uses the base-R random-generation
 function for its family (e.g. \code{\link[=rgamma]{rgamma()}} for a gamma distribution). A
 discretised distribution is sampled on its integer support.
 
-A \code{max}/\code{cdf_max} set with \code{\link[=bound_dist]{bound_dist()}} is respected: samples are drawn
-from the truncated distribution, by inverse CDF rather than by discarding
-draws beyond the bound, so every draw falls within it and a bound far into
-the tail costs no more than an unbounded one.
+A \code{max}/\code{cdf_max} set with \code{\link[=bound_dist]{bound_dist()}} on a parametric distribution is
+respected: samples are drawn from the truncated distribution by inverse
+CDF rather than by discarding draws beyond the bound, so the cost does not
+depend on how much of the mass the bound cuts off.
 
 Only distributions with fixed parameters can be sampled. If any parameter is
 itself a distribution (a prior), there is no single distribution to sample
