@@ -437,6 +437,10 @@ draw_components <- function(x, n) {
 #' bound cuts off nearly all of the mass (e.g. `Normal(mean = 100, sd = 1,
 #' max = 90)`, whose tail beyond 90 has probability of order 1e-24).
 #'
+#' The computation runs on the log scale throughout, so a bound far enough
+#' into the lower tail for `F(upper)` to underflow to zero in double precision
+#' (e.g. `Normal(mean = 100, sd = 1, max = 20)`) still samples correctly.
+#'
 #' @param x A single (non-composite) `<dist_spec>`.
 #' @param n The number of samples to draw.
 #' @param rng The base-R random-generation function for the family (e.g.
@@ -453,13 +457,20 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
   if (!is_constrained(x)) {
     return(do.call(rng, c(list(n), params)))
   }
-  upper_cdf <- attr(x, "cdf_max") %||% 1
+  ## everything is done on the log scale: for a bound deep in the lower tail
+  ## `F(max)` underflows to 0 in double precision (e.g. `pnorm(20, 100, 1)`),
+  ## which would collapse every draw onto the support boundary
+  log_upper <- log(attr(x, "cdf_max") %||% 1)
   max_value <- attr(x, "max") %||% Inf
   if (is.finite(max_value)) {
-    upper_cdf <- min(upper_cdf, do.call(cdf, c(list(max_value), params)))
+    log_upper <- min(
+      log_upper,
+      do.call(cdf, c(list(max_value), params, list(log.p = TRUE)))
+    )
   }
-  u <- runif(n, min = 0, max = upper_cdf)
-  do.call(quantile, c(list(u), params))
+  ## u is uniform on (0, F(upper)); log(u) = log F(upper) + log(uniform)
+  log_u <- log_upper + log(runif(n))
+  do.call(quantile, c(list(log_u), params, list(log.p = TRUE)))
 }
 
 #' Returns the maximum of one or more delay distribution

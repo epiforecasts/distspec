@@ -30,7 +30,10 @@ draws exactly from the bounded distribution via inverse-CDF sampling:
 uniformly on \verb{(0, F(upper))}, and the quantile at \code{u} is returned. This
 takes a single pass, unlike a rejection loop (resampling from the unbounded
 distribution until a draw falls within the bound), which can hang when the
-bound cuts off nearly all of the mass (e.g. \code{Normal(mean = 100, sd = 1,
-max = 90)}, whose tail beyond 90 has probability of order 1e-24).
+bound cuts off nearly all of the mass (e.g. \code{Normal(mean = 100, sd = 1, max = 90)}, whose tail beyond 90 has probability of order 1e-24).
+
+The computation runs on the log scale throughout, so a bound far enough
+into the lower tail for \code{F(upper)} to underflow to zero in double precision
+(e.g. \code{Normal(mean = 100, sd = 1, max = 20)}) still samples correctly.
 }
 \keyword{internal}

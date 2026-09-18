@@ -123,6 +123,19 @@ test_that("sample_dist doesn't hang for a bound deep in the tail", {
   expect_true(all(samples <= 90))
 })
 
+test_that("sample_dist handles a bound whose CDF underflows to zero", {
+  ## `pnorm(20, 100, 1)` is 0 in double precision, so sampling on the natural
+  ## scale would collapse every draw onto the support boundary (-Inf here)
+  set.seed(1)
+  samples <- sample_dist(Normal(mean = 100, sd = 1, max = 20), 100)
+  expect_true(all(is.finite(samples)))
+  expect_true(all(samples <= 20))
+  ## the same on a support bounded below, where the boundary is 0
+  gamma_samples <- sample_dist(Gamma(shape = 200, rate = 1, max = 0.02), 100)
+  expect_true(all(gamma_samples > 0))
+  expect_true(all(gamma_samples <= 0.02))
+})
+
 test_that("sample_dist respects `cdf_max` for a beta distribution", {
   set.seed(1)
   dist <- bound_dist(Beta(shape1 = 2, shape2 = 5), cdf_max = 0.9)
