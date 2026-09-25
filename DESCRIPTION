@@ -49,3 +49,5 @@ Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Remotes:
+    epinowcast/primarycensored@release-1.6.0
