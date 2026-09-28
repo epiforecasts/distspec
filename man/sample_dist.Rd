@@ -26,10 +26,15 @@ of \code{n} samples per component (\code{rowSums()} gives \code{n} samples of th
 distribution).
 }
 \description{
-Draws random samples from a \verb{<dist_spec>} whose parameters are fixed numbers,
-using the base-R random-generation function for its family (e.g. \code{\link[=rgamma]{rgamma()}}
-for a gamma distribution). A discretised distribution is sampled on its
-integer support.
+Draws random samples from a \verb{<dist_spec>} whose parameters are fixed
+numbers. An unbounded distribution uses the base-R random-generation
+function for its family (e.g. \code{\link[=rgamma]{rgamma()}} for a gamma distribution). A
+discretised distribution is sampled on its integer support.
+
+A \code{max}/\code{cdf_max} set with \code{\link[=bound_dist]{bound_dist()}} on a parametric distribution is
+respected: samples are drawn from the truncated distribution by inverse
+CDF rather than by discarding draws beyond the bound, so the cost does not
+depend on how much of the mass the bound cuts off.
 
 Only distributions with fixed parameters can be sampled. If any parameter is
 itself a distribution (a prior), there is no single distribution to sample
@@ -38,7 +43,11 @@ from and an error is raised.
 A composite (multi-component) distribution is sampled per component, in
 keeping with \code{mean()}/\code{sd()}, which also return one value per component. Use
 \code{rowSums()} on the result to obtain samples of the combined (convolved)
-distribution.
+distribution. A \code{max}/\code{cdf_max} set on the composite itself (with
+\code{\link[=bound_dist]{bound_dist()}} on the sum) refers to that combined distribution, which has
+no closed-form distribution to draw from, so sampling such a composite
+raises an error. Bound the components individually to sample them under a
+bound.
 }
 \examples{
 # Samples from a fixed gamma distribution

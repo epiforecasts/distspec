@@ -73,8 +73,8 @@ sd.beta <- function(x, ...) {
   sqrt(a * b / ((a + b)^2 * (a + b + 1)))
 }
 
-#' @importFrom stats rbeta
+#' @importFrom stats rbeta pbeta qbeta
 #' @exportS3Method
 sample_dist.beta <- function(x, n, ...) {
-  rbeta(n, shape1 = x$parameters$shape1, shape2 = x$parameters$shape2)
+  sample_bounded(x, n, rng = rbeta, cdf = pbeta, quantile = qbeta)
 }

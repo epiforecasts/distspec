@@ -60,8 +60,8 @@ mean.gamma <- function(x, ...) x$parameters$shape / x$parameters$rate
 #' @export
 sd.gamma <- function(x, ...) sqrt(x$parameters$shape / x$parameters$rate^2)
 
-#' @importFrom stats rgamma
+#' @importFrom stats rgamma qgamma
 #' @exportS3Method
 sample_dist.gamma <- function(x, n, ...) {
-  rgamma(n, shape = x$parameters$shape, rate = x$parameters$rate)
+  sample_bounded(x, n, rng = rgamma, cdf = pgamma, quantile = qgamma)
 }

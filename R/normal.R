@@ -45,8 +45,8 @@ mean.normal <- function(x, ...) x$parameters$mean
 #' @export
 sd.normal <- function(x, ...) x$parameters$sd
 
-#' @importFrom stats rnorm
+#' @importFrom stats rnorm qnorm
 #' @exportS3Method
 sample_dist.normal <- function(x, n, ...) {
-  rnorm(n, mean = x$parameters$mean, sd = x$parameters$sd)
+  sample_bounded(x, n, rng = rnorm, cdf = pnorm, quantile = qnorm)
 }
