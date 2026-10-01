@@ -33,6 +33,9 @@ lower_bounds.normal <- function(x) {
 dist_cdf.normal <- function(x) pnorm
 
 #' @exportS3Method
+dist_quantile.normal <- function(x) qnorm
+
+#' @exportS3Method
 to_natural.normal <- function(x, ux) {
   list(mean = ux$mean, sd = ux$sd)
 }
