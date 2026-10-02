@@ -481,10 +481,10 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
 #'
 #' @description
 #' Shared by [quantile_bounded()] and [cdf_bounded()]: `upper` is the smaller
-#' of `max` and the `cdf_max` quantile, and this returns `log F(upper)`,
-#' computed on the log scale throughout so a bound deep in the tail (where
-#' `F(upper)` underflows to zero in double precision) doesn't collapse to the
-#' support boundary.
+#' of `max` and the `cdf_max` quantile. This returns `log F(upper)`, computed
+#' on the log scale throughout, so a bound deep in the tail (where
+#' `F(upper)` underflows to zero in double precision) still gives the
+#' correct value instead of collapsing onto the support boundary.
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param params The result of `get_parameters(x)`.
