@@ -4,6 +4,11 @@
 
 - Exported `dist_cdf()` and added `dist_quantile()`, so packages built on distspec can look up a distribution's CDF and quantile functions directly instead of reimplementing per-family dispatch.
 
+## Bug fixes
+
+- `sample_dist()` now respects a distribution's `max` and `cdf_max` bounds instead of sampling from the unbounded distribution; samples are drawn exactly via inverse-CDF sampling on the truncated range, computed on the log scale so that a bound deep in the lower tail (where the CDF underflows to zero in double precision) still samples correctly. This also fixes bounded sampling of a component within a composite (multi-`dist_spec`) distribution and lets `cdf_max` apply to `Beta()`. Sampling a composite that has a `max`/`cdf_max` of its own now raises an informative error, since such a bound constrains the sum of the components, which has no closed-form distribution to sample from.
+- `sample_dist()` of a composite distribution now returns an `n` by `k` matrix for `n = 1` as documented; previously it returned a length-`k` vector, so the documented `rowSums()` idiom errored.
+
 # distspec 0.2.0
 
 ## New features
