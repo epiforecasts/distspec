@@ -484,11 +484,11 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
 #' unbounded quantile function `dist_quantile(x)`. Otherwise it computes the
 #' quantile of the truncated distribution exactly: `F_trunc^{-1}(p) =
 #' F^{-1}(p * F(upper))`, where `upper` is the smaller of `max` and the
-#' `cdf_max` quantile. This follows the same log-scale approach as
-#' [sample_bounded()] (which this mirrors for a requested probability `p`
-#' instead of a uniform draw), so a bound deep in the tail (where `F(upper)`
-#' underflows to zero in double precision) still gives the correct quantile
-#' rather than collapsing onto the support boundary.
+#' `cdf_max` quantile. This mirrors [sample_bounded()], but for a requested
+#' probability `p` instead of a uniform draw. The computation runs on the log
+#' scale throughout, so a bound deep in the tail (where `F(upper)` underflows
+#' to zero in double precision) still gives the correct quantile instead of
+#' collapsing onto the support boundary.
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param probs Numeric vector of probabilities in `[0, 1]`.
@@ -520,7 +520,7 @@ quantile_bounded <- function(x, probs) {
 #' Used by [cdf.dist_spec()]. If `x` is unconstrained this just calls the
 #' unbounded CDF `dist_cdf(x)`. Otherwise it computes the CDF of the truncated
 #' distribution: `F_trunc(q) = F(q) / F(upper)`, capped at `1` for `q` at or
-#' beyond `upper`. Computed on the log scale for the same reason as
+#' beyond `upper`. This is computed on the log scale for the same reason as
 #' [quantile_bounded()].
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
