@@ -477,31 +477,22 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
   do.call(quantile, c(list(log_u), params, list(log.p = TRUE)))
 }
 
-#' Quantile function respecting a `max`/`cdf_max` bound
+#' Log of `F(upper)` for a `max`/`cdf_max` bound
 #'
 #' @description
-#' Used by [quantile.dist_spec()]. If `x` is unconstrained this just calls the
-#' unbounded quantile function `dist_quantile(x)`. Otherwise it computes the
-#' quantile of the truncated distribution exactly: `F_trunc^{-1}(p) =
-#' F^{-1}(p * F(upper))`, where `upper` is the smaller of `max` and the
-#' `cdf_max` quantile. This mirrors [sample_bounded()], but for a requested
-#' probability `p` instead of a uniform draw. The computation runs on the log
-#' scale throughout, so a bound deep in the tail (where `F(upper)` underflows
-#' to zero in double precision) still gives the correct quantile instead of
-#' collapsing onto the support boundary.
+#' Shared by [quantile_bounded()] and [cdf_bounded()]: `upper` is the smaller
+#' of `max` and the `cdf_max` quantile, and this returns `log F(upper)`,
+#' computed on the log scale throughout so a bound deep in the tail (where
+#' `F(upper)` underflows to zero in double precision) doesn't collapse to the
+#' support boundary.
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
-#' @param probs Numeric vector of probabilities in `[0, 1]`.
-#' @return A numeric vector of quantiles, the same length as `probs`.
+#' @param params The result of `get_parameters(x)`.
+#' @param cdf The family's CDF function, as returned by `dist_cdf(x)`.
+#' @return A single numeric value, `log F(upper)`.
 #' @importFrom rlang `%||%`
 #' @keywords internal
-quantile_bounded <- function(x, probs) {
-  params <- get_parameters(x)
-  quantile_fn <- dist_quantile(x)
-  if (!is_constrained(x)) {
-    return(do.call(quantile_fn, c(list(probs), params)))
-  }
-  cdf <- dist_cdf(x)
+log_upper_bound <- function(x, params, cdf) {
   log_upper <- log(attr(x, "cdf_max") %||% 1)
   max_value <- attr(x, "max") %||% Inf
   if (is.finite(max_value)) {
@@ -510,7 +501,32 @@ quantile_bounded <- function(x, probs) {
       do.call(cdf, c(list(max_value), params, list(log.p = TRUE)))
     )
   }
-  log_p <- log_upper + log(probs)
+  log_upper
+}
+
+#' Quantile function respecting a `max`/`cdf_max` bound
+#'
+#' @description
+#' Used by [quantile.dist_spec()]. If `x` is unconstrained this just calls the
+#' unbounded quantile function `dist_quantile(x)`. Otherwise it computes the
+#' quantile of the truncated distribution exactly: `F_trunc^{-1}(p) =
+#' F^{-1}(p * F(upper))`, where `upper` is the smaller of `max` and the
+#' `cdf_max` quantile (see [log_upper_bound()]). This mirrors
+#' [sample_bounded()], but for a requested probability `p` instead of a
+#' uniform draw.
+#'
+#' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
+#' @param probs Numeric vector of probabilities in `[0, 1]`.
+#' @return A numeric vector of quantiles, the same length as `probs`.
+#' @keywords internal
+quantile_bounded <- function(x, probs) {
+  params <- get_parameters(x)
+  quantile_fn <- dist_quantile(x)
+  if (!is_constrained(x)) {
+    return(do.call(quantile_fn, c(list(probs), params)))
+  }
+  cdf <- dist_cdf(x)
+  log_p <- log_upper_bound(x, params, cdf) + log(probs)
   do.call(quantile_fn, c(list(log_p), params, list(log.p = TRUE)))
 }
 
@@ -520,13 +536,11 @@ quantile_bounded <- function(x, probs) {
 #' Used by [cdf.dist_spec()]. If `x` is unconstrained this just calls the
 #' unbounded CDF `dist_cdf(x)`. Otherwise it computes the CDF of the truncated
 #' distribution: `F_trunc(q) = F(q) / F(upper)`, capped at `1` for `q` at or
-#' beyond `upper`. This is computed on the log scale for the same reason as
-#' [quantile_bounded()].
+#' beyond `upper` (see [log_upper_bound()]).
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param q Numeric vector of values to evaluate the CDF at.
 #' @return A numeric vector, the same length as `q`.
-#' @importFrom rlang `%||%`
 #' @keywords internal
 cdf_bounded <- function(x, q) {
   params <- get_parameters(x)
@@ -534,14 +548,7 @@ cdf_bounded <- function(x, q) {
   if (!is_constrained(x)) {
     return(do.call(cdf, c(list(q), params)))
   }
-  log_upper <- log(attr(x, "cdf_max") %||% 1)
-  max_value <- attr(x, "max") %||% Inf
-  if (is.finite(max_value)) {
-    log_upper <- min(
-      log_upper,
-      do.call(cdf, c(list(max_value), params, list(log.p = TRUE)))
-    )
-  }
+  log_upper <- log_upper_bound(x, params, cdf)
   log_fq <- do.call(cdf, c(list(q), params, list(log.p = TRUE)))
   pmin(exp(log_fq - log_upper), 1)
 }

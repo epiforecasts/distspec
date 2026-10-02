@@ -18,7 +18,6 @@ A numeric vector, the same length as \code{q}.
 Used by \code{\link[=cdf.dist_spec]{cdf.dist_spec()}}. If \code{x} is unconstrained this just calls the
 unbounded CDF \code{dist_cdf(x)}. Otherwise it computes the CDF of the truncated
 distribution: \code{F_trunc(q) = F(q) / F(upper)}, capped at \code{1} for \code{q} at or
-beyond \code{upper}. Computed on the log scale for the same reason as
-\code{\link[=quantile_bounded]{quantile_bounded()}}.
+beyond \code{upper} (see \code{\link[=log_upper_bound]{log_upper_bound()}}).
 }
 \keyword{internal}
