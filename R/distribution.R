@@ -13,7 +13,7 @@
 #' @description
 #' Returns the distribution's CDF as a base-R `p*` function (e.g. `pgamma`),
 #' ready to call with its own parameters. Used to discretise a distribution
-#' via {primarycensored}.
+#' via `{primarycensored}`.
 #' @param x A `<dist_spec>`.
 #' @return A function.
 #' @keywords internal

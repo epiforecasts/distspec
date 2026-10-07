@@ -1,5 +1,7 @@
 # distspec (development version)
 
+# distspec 0.3.0
+
 ## New features
 
 - Exported `dist_cdf()` and added `dist_quantile()`, so packages built on distspec can look up a distribution's CDF and quantile functions directly instead of reimplementing per-family dispatch.

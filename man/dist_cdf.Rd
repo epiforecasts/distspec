@@ -15,7 +15,7 @@ A function.
 \description{
 Returns the distribution's CDF as a base-R \verb{p*} function (e.g. \code{pgamma}),
 ready to call with its own parameters. Used to discretise a distribution
-via {primarycensored}.
+via \code{{primarycensored}}.
 }
 \examples{
 dist_cdf(Gamma(shape = 1, rate = 1))
