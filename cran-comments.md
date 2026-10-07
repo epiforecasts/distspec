@@ -4,4 +4,4 @@
 
 ## Notes
 
-This release comes four weeks after the initial 0.1.0 submission. It starts a deprecation cycle for a renamed argument that the next CRAN release of EpiNow2 needs, allowing EpiNow2 to depend on the CRAN version of distspec. We apologise for the quick succession and expect future releases to follow a slower cadence.
+This release adds `dist_cdf()`, `dist_quantile()`, `quantile.dist_spec()` and `cdf()`, and fixes two bugs in `sample_dist()` (bounds were not respected when sampling, and a composite distribution's `n = 1` case returned the wrong shape). No breaking changes.
