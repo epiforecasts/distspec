@@ -3,6 +3,7 @@
 ## New features
 
 - Exported `dist_cdf()` and added `dist_quantile()`, so packages built on distspec can look up a distribution's CDF and quantile functions directly instead of reimplementing per-family dispatch.
+- Added `quantile.dist_spec()` and `cdf()`, truncation-aware quantile and cumulative distribution functions for a `<dist_spec>` with fixed parameters; both respect a `max`/`cdf_max` bound set with `bound_dist()` and give every quantile/CDF value of a `Fixed()` distribution its point-mass value. Each raises an informative error for a distribution with uncertain parameters, or one with no analytic CDF (e.g. `NonParametric()`). A composite (multi-component) distribution returns one set of values per component, in keeping with `mean()`/`sd()`.
 
 ## Bug fixes
 
