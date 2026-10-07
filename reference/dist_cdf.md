@@ -1,0 +1,39 @@
+# Get a distribution's cumulative distribution function
+
+Returns the distribution's CDF as a base-R `p*` function (e.g.
+`pgamma`), ready to call with its own parameters. Used to discretise a
+distribution via `{primarycensored}`.
+
+## Usage
+
+``` r
+dist_cdf(x)
+```
+
+## Arguments
+
+- x:
+
+  A `<dist_spec>`.
+
+## Value
+
+A function.
+
+## Examples
+
+``` r
+dist_cdf(Gamma(shape = 1, rate = 1))
+#> function (q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE, 
+#>     log.p = FALSE) 
+#> {
+#>     if (!missing(rate) && !missing(scale)) {
+#>         if (abs(rate * scale - 1) < 1e-15) 
+#>             warning("specify 'rate' or 'scale' but not both")
+#>         else stop("specify 'rate' or 'scale' but not both")
+#>     }
+#>     .Call(C_pgamma, q, shape, scale, lower.tail, log.p)
+#> }
+#> <bytecode: 0x5623118baae0>
+#> <environment: namespace:stats>
+```
