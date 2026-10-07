@@ -18,9 +18,9 @@ A single numeric value, \verb{log F(upper)}.
 }
 \description{
 Shared by \code{\link[=quantile_bounded]{quantile_bounded()}} and \code{\link[=cdf_bounded]{cdf_bounded()}}: \code{upper} is the smaller
-of \code{max} and the \code{cdf_max} quantile, and this returns \verb{log F(upper)},
-computed on the log scale throughout so a bound deep in the tail (where
-\code{F(upper)} underflows to zero in double precision) doesn't collapse to the
-support boundary.
+of \code{max} and the \code{cdf_max} quantile. This returns \verb{log F(upper)}, computed
+on the log scale throughout, so a bound deep in the tail (where
+\code{F(upper)} underflows to zero in double precision) still gives the
+correct value instead of collapsing onto the support boundary.
 }
 \keyword{internal}

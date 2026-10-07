@@ -1,12 +1,25 @@
-# CDF interface for discretisation
+# CDF and quantile interface
 #
-# `dist_cdf()` returns a distribution's cumulative distribution function (a
-# base-R `p*` function such as `pgamma`), used to discretise it via
-# {primarycensored}. It is an optional per-type capability: a distribution that
-# is never discretised (e.g. beta, the Dirichlet prior, the already-discretised
-# nonparametric) provides no method and errors informatively via
-# `dist_cdf.default()`.
+# `dist_cdf()`/`dist_quantile()` return a distribution's cumulative
+# distribution and quantile functions (base-R `p*`/`q*` functions such as
+# `pgamma`/`qgamma`). `dist_cdf()` is used to discretise a distribution via
+# {primarycensored}. Both are an optional per-type capability: a distribution
+# with no closed-form CDF/quantile function (e.g. beta, the Dirichlet prior,
+# the already-discretised nonparametric) provides no method and errors
+# informatively via the `.default` method.
 
+#' Get a distribution's cumulative distribution function
+#'
+#' @description
+#' Returns the distribution's CDF as a base-R `p*` function (e.g. `pgamma`),
+#' ready to call with its own parameters. Used to discretise a distribution
+#' via {primarycensored}.
+#' @param x A `<dist_spec>`.
+#' @return A function.
+#' @keywords internal
+#' @export
+#' @examples
+#' dist_cdf(Gamma(shape = 1, rate = 1))
 dist_cdf <- function(x) UseMethod("dist_cdf")
 
 #' @exportS3Method
@@ -16,12 +29,18 @@ dist_cdf.default <- function(x) {
   )
 }
 
-# `dist_quantile()` returns a distribution's quantile function (a base-R `q*`
-# function such as `qgamma`), the counterpart to `dist_cdf()` used by
-# `quantile.dist_spec()`. Like `dist_cdf()` it is an optional per-type
-# capability: a type without a method errors informatively via
-# `dist_quantile.default()`.
-
+#' Get a distribution's quantile function
+#'
+#' @description
+#' Returns the distribution's quantile function as a base-R `q*` function
+#' (e.g. `qgamma`), ready to call with its own parameters.
+#' @inheritParams dist_cdf
+#' @return A function.
+#' @keywords internal
+#' @export
+#' @importFrom stats qexp qgamma qlnorm qnorm qweibull
+#' @examples
+#' dist_quantile(Gamma(shape = 1, rate = 1))
 dist_quantile <- function(x) UseMethod("dist_quantile")
 
 #' @exportS3Method
