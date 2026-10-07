@@ -41,6 +41,8 @@ reference:
       - mean.dist_spec
       - sd
       - max.dist_spec
+      - quantile.dist_spec
+      - cdf
       - is_constrained
   - title: Combine and modify distributions
     desc: Combine, convolve, discretise and fix the parameters of distributions.

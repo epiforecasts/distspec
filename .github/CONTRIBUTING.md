@@ -98,7 +98,7 @@ A `<dist_spec>` carries its distribution type as the head of its S3 class (e.g. 
 
 ### The methods
 
-Create `R/<type>.R` and implement the methods that apply. Only `natural_params()` and `lower_bounds()` are always required. `mean()`/`sd()` need a closed form, `sample_dist()` gives random draws, `dist_cdf()` is only for distributions that can be discretised, and `to_natural()` is needed only if your constructor accepts an alternative parameterisation (e.g. `mean`/`sd`) that must be converted to the natural parameters.
+Create `R/<type>.R` and implement the methods that apply. Only `natural_params()` and `lower_bounds()` are always required. `mean()`/`sd()` need a closed form, `sample_dist()` gives random draws, `dist_cdf()` is only for distributions that can be discretised, `dist_quantile()` backs `quantile()` and `cdf()` for distributions with a closed-form quantile function, and `to_natural()` is needed only if your constructor accepts an alternative parameterisation (e.g. `mean`/`sd`) that must be converted to the natural parameters.
 
 ```r
 # R/mydist.R -- methods for the "mydist" distribution. Each dispatches on the
@@ -154,6 +154,14 @@ to_natural.mydist <- function(x) {
 # informatively via `dist_cdf.default()`).
 #' @exportS3Method
 dist_cdf.mydist <- function(x) pmydist
+
+# Optional (quantiles): the quantile function as a *function* whose arguments
+# match the natural parameters (e.g. a base-R `q*` function such as `qgamma`),
+# used by `quantile()` and (together with `dist_cdf()`) `cdf()`. Provide this
+# only if the distribution has one; omit it otherwise (it then errors
+# informatively via `dist_quantile.default()`).
+#' @exportS3Method
+dist_quantile.mydist <- function(x) qmydist
 
 # Optional (bespoke discretisation): if your distribution discretises in a
 # special way rather than through a CDF (as the point-mass `fixed` does), provide

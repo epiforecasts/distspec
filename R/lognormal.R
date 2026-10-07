@@ -37,6 +37,9 @@ lower_bounds.lognormal <- function(x) {
 dist_cdf.lognormal <- function(x) plnorm
 
 #' @exportS3Method
+dist_quantile.lognormal <- function(x) qlnorm
+
+#' @exportS3Method
 to_natural.lognormal <- function(x, ux) {
   if (all(c("mean", "sd") %in% names(ux))) {
     list(

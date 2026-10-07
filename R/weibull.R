@@ -35,6 +35,9 @@ lower_bounds.weibull <- function(x) {
 #' @exportS3Method
 dist_cdf.weibull <- function(x) pweibull
 
+#' @exportS3Method
+dist_quantile.weibull <- function(x) qweibull
+
 #' @importFrom stats uniroot
 #' @exportS3Method
 to_natural.weibull <- function(x, ux) {

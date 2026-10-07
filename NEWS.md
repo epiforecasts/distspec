@@ -1,5 +1,9 @@
 # distspec (development version)
 
+## New features
+
+- Added `quantile.dist_spec()` and `cdf()`, truncation-aware quantile and cumulative distribution functions for a `<dist_spec>` with fixed parameters; both respect a `max`/`cdf_max` bound set with `bound_dist()` and give every quantile/CDF value of a `Fixed()` distribution its point-mass value. Each raises an informative error for a distribution with uncertain parameters, or one with no analytic CDF (e.g. `NonParametric()`). A composite (multi-component) distribution returns one set of values per component, in keeping with `mean()`/`sd()`.
+
 ## Bug fixes
 
 - `sample_dist()` now respects a distribution's `max` and `cdf_max` bounds instead of sampling from the unbounded distribution; samples are drawn exactly via inverse-CDF sampling on the truncated range, computed on the log scale so that a bound deep in the lower tail (where the CDF underflows to zero in double precision) still samples correctly. This also fixes bounded sampling of a component within a composite (multi-`dist_spec`) distribution and lets `cdf_max` apply to `Beta()`. Sampling a composite that has a `max`/`cdf_max` of its own now raises an informative error, since such a bound constrains the sum of the components, which has no closed-form distribution to sample from.
