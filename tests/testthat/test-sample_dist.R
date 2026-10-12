@@ -189,9 +189,9 @@ test_that("sample_dist errors on a bound set on a composite as a whole", {
   expect_no_error(sample_dist(per_component, 10))
 })
 
-test_that("sample_dist round-trips with dist_cdf for unbounded distributions", {
+test_that("sample_dist round-trips with family_cdf for unbounded distributions", {
   ## for a continuous distribution X, F(X) is Uniform(0, 1); this checks
-  ## sample_dist() against dist_cdf() (and, for Beta(), pbeta()) independently
+  ## sample_dist() against family_cdf() (and, for Beta(), pbeta()) independently
   ## of any particular parameterisation
   set.seed(1)
   n <- 2000
@@ -204,17 +204,17 @@ test_that("sample_dist round-trips with dist_cdf for unbounded distributions", {
   )
   for (dist in dists) {
     samples <- sample_dist(dist, n)
-    cdf <- dist_cdf(dist)
+    cdf <- family_cdf(dist)
     u <- do.call(cdf, c(list(samples), get_parameters(dist)))
     expect_gt(ks.test(u, "punif")$p.value, 0.001)
   }
-  ## Beta() has no dist_cdf() method, so is paired with pbeta() directly
+  ## Beta() has no family_cdf() method, so is paired with pbeta() directly
   beta <- Beta(shape1 = 2, shape2 = 5)
   u <- pbeta(sample_dist(beta, n), shape1 = 2, shape2 = 5)
   expect_gt(ks.test(u, "punif")$p.value, 0.001)
 })
 
-test_that("sample_dist round-trips with dist_cdf for a `max`-bounded distribution", {
+test_that("sample_dist round-trips with family_cdf for a `max`-bounded distribution", {
   set.seed(1)
   n <- 2000
   dist <- Gamma(shape = 2, rate = 1, max = 3)
@@ -224,7 +224,7 @@ test_that("sample_dist round-trips with dist_cdf for a `max`-bounded distributio
   expect_gt(ks.test(u, "punif")$p.value, 0.001)
 })
 
-test_that("sample_dist round-trips with dist_cdf for a `cdf_max`-bounded distribution", {
+test_that("sample_dist round-trips with family_cdf for a `cdf_max`-bounded distribution", {
   set.seed(1)
   n <- 2000
   dist <- bound_dist(Weibull(shape = 2, scale = 3), cdf_max = 0.9)

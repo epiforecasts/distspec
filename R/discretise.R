@@ -48,7 +48,7 @@
 #' @importFrom primarycensored dprimarycensored
 #'
 #' @param x A `<dist_spec>`. Discretisation dispatches on the distribution type:
-#'   any type with a `dist_cdf()` method uses the default `.dist_spec` method,
+#'   any type with a `family_cdf()` method uses the default `.dist_spec` method,
 #'   while `"fixed"` is handled as a point mass by its own method.
 #'
 #' @param ... Additional arguments passed to methods. The default method takes
@@ -67,10 +67,10 @@ discrete_pmf <- function(x, ...) {
 discrete_pmf.dist_spec <- function(x, max_value, cdf_max, width, ...) {
   params <- get_parameters(x)
 
-  ## CDF function for the distribution type (a type without a `dist_cdf()`
-  ## method errors via `dist_cdf.default`; the point-mass `fixed` overrides this
-  ## method entirely)
-  cdf <- dist_cdf(x)
+  ## CDF function for the distribution type (a type without a `family_cdf()`
+  ## method errors via `family_cdf.default`; the point-mass `fixed` overrides
+  ## this method entirely)
+  cdf <- family_cdf(x)
 
   ## truncate at the `cdf_max` quantile if one is set (1 = keep everything)
   if (!missing(cdf_max) && cdf_max < 1) {

@@ -1,7 +1,7 @@
 # Beta distribution
 #
 # Per-type methods for the beta distribution; see `gamma.R` and #64. The beta
-# distribution is not discretised, so it provides no `dist_cdf()` method.
+# distribution is not discretised, so it provides no `family_cdf()` method.
 
 #' Beta distribution
 #'

@@ -11,7 +11,7 @@ log_upper_bound(x, params, cdf)
 
 \item{params}{The result of \code{get_parameters(x)}.}
 
-\item{cdf}{The family's CDF function, as returned by \code{dist_cdf(x)}.}
+\item{cdf}{The family's CDF function, as returned by \code{family_cdf(x)}.}
 }
 \value{
 A single numeric value, \verb{log F(upper)}.

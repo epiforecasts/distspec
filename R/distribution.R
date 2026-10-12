@@ -1,51 +1,62 @@
 # CDF and quantile interface
 #
-# `dist_cdf()`/`dist_quantile()` return a distribution's cumulative
+# `family_cdf()`/`family_quantile()` return a distribution's cumulative
 # distribution and quantile functions (base-R `p*`/`q*` functions such as
-# `pgamma`/`qgamma`). `dist_cdf()` is used to discretise a distribution via
-# {primarycensored}. Both are an optional per-type capability: a distribution
-# with no closed-form CDF/quantile function (e.g. beta, the Dirichlet prior,
-# the already-discretised nonparametric) provides no method and errors
-# informatively via the `.default` method.
+# `pgamma`/`qgamma`). `family_cdf()` is used to discretise a distribution via
+# {primarycensored}, and both underlie the bound-aware `cdf()` and
+# `quantile()`. Both are an optional per-type capability: a distribution
+# without a method (e.g. beta, the Dirichlet prior, the already-discretised
+# nonparametric) errors informatively via the `.default` method.
 
-#' Get a distribution's cumulative distribution function
+#' Get a distribution's base-R CDF or quantile function
 #'
 #' @description
-#' Returns the distribution's CDF as a base-R `p*` function (e.g. `pgamma`),
-#' ready to call with its own parameters. Used to discretise a distribution
-#' via `{primarycensored}`.
+#' Returns the base-R `p*` or `q*` function (e.g. `pgamma`) for the family of
+#' `x`, ignoring any `max`/`cdf_max` bound.
 #' @param x A `<dist_spec>`.
 #' @return A function.
 #' @keywords internal
-#' @export
-#' @examples
-#' dist_cdf(Gamma(shape = 1, rate = 1))
-dist_cdf <- function(x) UseMethod("dist_cdf")
+#' @noRd
+family_cdf <- function(x) UseMethod("family_cdf")
 
 #' @exportS3Method
-dist_cdf.default <- function(x) {
+family_cdf.default <- function(x) {
   cli::cli_abort(
     "{.val {class(x)[1]}} has no CDF and cannot be discretised."
   )
 }
 
-#' Get a distribution's quantile function
-#'
-#' @description
-#' Returns the distribution's quantile function as a base-R `q*` function
-#' (e.g. `qgamma`), ready to call with its own parameters.
-#' @inheritParams dist_cdf
-#' @return A function.
-#' @keywords internal
-#' @export
+#' @noRd
 #' @importFrom stats qexp qgamma qlnorm qnorm qweibull
-#' @examples
-#' dist_quantile(Gamma(shape = 1, rate = 1))
-dist_quantile <- function(x) UseMethod("dist_quantile")
+family_quantile <- function(x) UseMethod("family_quantile")
 
 #' @exportS3Method
-dist_quantile.default <- function(x) {
+family_quantile.default <- function(x) {
   cli::cli_abort(
     "{.val {class(x)[1]}} has no quantile function."
   )
+}
+
+#' Get a distribution's CDF or quantile function
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' `dist_cdf()` and `dist_quantile()` are deprecated because they ignore any
+#' `max`/`cdf_max` bound set with [bound_dist()]. Use [cdf()] and
+#' [quantile()][quantile.dist_spec()] instead, which respect the bound.
+#' @param x A `<dist_spec>`.
+#' @return A function.
+#' @keywords internal
+#' @export
+dist_cdf <- function(x) {
+  lifecycle::deprecate_warn("0.3.1", "dist_cdf()", "cdf()")
+  family_cdf(x)
+}
+
+#' @rdname dist_cdf
+#' @export
+dist_quantile <- function(x) {
+  lifecycle::deprecate_warn("0.3.1", "dist_quantile()", "quantile()")
+  family_quantile(x)
 }

@@ -8,7 +8,7 @@ discrete_pmf(x, ...)
 }
 \arguments{
 \item{x}{A \verb{<dist_spec>}. Discretisation dispatches on the distribution type:
-any type with a \code{dist_cdf()} method uses the default \code{.dist_spec} method,
+any type with a \code{family_cdf()} method uses the default \code{.dist_spec} method,
 while \code{"fixed"} is handled as a point mass by its own method.}
 
 \item{...}{Additional arguments passed to methods. The default method takes

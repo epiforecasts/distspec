@@ -16,7 +16,7 @@ A numeric vector of quantiles, the same length as \code{probs}.
 }
 \description{
 Used by \code{\link[=quantile.dist_spec]{quantile.dist_spec()}}. If \code{x} is unconstrained this just calls the
-unbounded quantile function \code{dist_quantile(x)}. Otherwise it computes the
+unbounded quantile function \code{family_quantile(x)}. Otherwise it computes the
 quantile of the truncated distribution exactly: \code{F_trunc^{-1}(p) = F^{-1}(p * F(upper))}, where \code{upper} is the smaller of \code{max} and the
 \code{cdf_max} quantile (see \code{\link[=log_upper_bound]{log_upper_bound()}}). This mirrors
 \code{\link[=sample_bounded]{sample_bounded()}}, but for a requested probability \code{p} instead of a

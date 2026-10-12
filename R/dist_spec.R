@@ -488,7 +488,7 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param params The result of `get_parameters(x)`.
-#' @param cdf The family's CDF function, as returned by `dist_cdf(x)`.
+#' @param cdf The family's CDF function, as returned by `family_cdf(x)`.
 #' @return A single numeric value, `log F(upper)`.
 #' @importFrom rlang `%||%`
 #' @keywords internal
@@ -508,7 +508,7 @@ log_upper_bound <- function(x, params, cdf) {
 #'
 #' @description
 #' Used by [quantile.dist_spec()]. If `x` is unconstrained this just calls the
-#' unbounded quantile function `dist_quantile(x)`. Otherwise it computes the
+#' unbounded quantile function `family_quantile(x)`. Otherwise it computes the
 #' quantile of the truncated distribution exactly: `F_trunc^{-1}(p) =
 #' F^{-1}(p * F(upper))`, where `upper` is the smaller of `max` and the
 #' `cdf_max` quantile (see [log_upper_bound()]). This mirrors
@@ -521,11 +521,11 @@ log_upper_bound <- function(x, params, cdf) {
 #' @keywords internal
 quantile_bounded <- function(x, probs) {
   params <- get_parameters(x)
-  quantile_fn <- dist_quantile(x)
+  quantile_fn <- family_quantile(x)
   if (!is_constrained(x)) {
     return(do.call(quantile_fn, c(list(probs), params)))
   }
-  cdf <- dist_cdf(x)
+  cdf <- family_cdf(x)
   log_p <- log_upper_bound(x, params, cdf) + log(probs)
   do.call(quantile_fn, c(list(log_p), params, list(log.p = TRUE)))
 }
@@ -534,7 +534,7 @@ quantile_bounded <- function(x, probs) {
 #'
 #' @description
 #' Used by [cdf.dist_spec()]. If `x` is unconstrained this just calls the
-#' unbounded CDF `dist_cdf(x)`. Otherwise it computes the CDF of the truncated
+#' unbounded CDF `family_cdf(x)`. Otherwise it computes the CDF of the truncated
 #' distribution: `F_trunc(q) = F(q) / F(upper)`, capped at `1` for `q` at or
 #' beyond `upper` (see [log_upper_bound()]).
 #'
@@ -544,7 +544,7 @@ quantile_bounded <- function(x, probs) {
 #' @keywords internal
 cdf_bounded <- function(x, q) {
   params <- get_parameters(x)
-  cdf <- dist_cdf(x)
+  cdf <- family_cdf(x)
   if (!is_constrained(x)) {
     return(do.call(cdf, c(list(q), params)))
   }
