@@ -38,10 +38,10 @@ lower_bounds.exp <- function(x) {
 }
 
 #' @exportS3Method
-dist_cdf.exp <- function(x) pexp
+family_cdf.exp <- function(x) pexp
 
 #' @exportS3Method
-dist_quantile.exp <- function(x) qexp
+family_quantile.exp <- function(x) qexp
 
 #' @exportS3Method
 to_natural.exp <- function(x, ux) {

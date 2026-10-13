@@ -8,47 +8,10 @@
 #' truncated distribution defined by distribution type, maximum value and model
 #' parameters.
 #'
-#' # Methodological details
-#'
-#' The probability mass function is computed using the `{primarycensored}`
-#' package, which provides double censored PMF calculations. This correctly
-#' represents the probability mass function of a double censored distribution
-#' arising from the difference of two censored events.
-#'
-#' The probability mass function of the discretised probability distribution is
-#'   a vector where the first entry corresponds to the integral over the (0,1]
-#'   interval of the corresponding continuous distribution (probability of
-#'   integer 0), the second entry corresponds to the (0,2] interval (probability
-#'   mass of integer 1), the third entry corresponds to the (1, 3] interval
-#'   (probability mass of integer 2), etc.
-#'
-#' The maximum value truncates the distribution: mass beyond it is dropped and
-#' the remaining PMF is renormalised to sum to one. A `cdf_max` below `1`
-#' additionally trims the tail, keeping the distribution only up to its
-#' `cdf_max` quantile.
-#'
-#' ## Fixed distributions
-#'
-#' A `Fixed()` (point-mass) distribution is not discretised through a CDF but by
-#' its own method: an integer value places all of the mass on that integer,
-#' while a fractional value splits the mass proportionally across the two
-#' adjacent integers. For example `Fixed(2.25)` places 0.75 on 2 and 0.25 on 3.
-#'
-#' @references
-#' Charniga, K., et al. “Best practices for estimating and reporting
-#'   epidemiological delay distributions of infectious diseases using public
-#'   health surveillance and healthcare data”, *arXiv e-prints*, 2024.
-#'   \doi{10.48550/arXiv.2405.08841}
-#' Park,  S. W.,  et al.,  "Estimating epidemiological delay distributions for
-#'   infectious diseases", *medRxiv*, 2024.
-#'   \doi{https://doi.org/10.1101/2024.01.12.24301247}
-#' Abbott S., et al., "primarycensored: Primary Event Censored Distributions",
-#'   2025. \doi{10.5281/zenodo.13632839}
-#'
 #' @importFrom primarycensored dprimarycensored
 #'
 #' @param x A `<dist_spec>`. Discretisation dispatches on the distribution type:
-#'   any type with a `dist_cdf()` method uses the default `.dist_spec` method,
+#'   any type with a `family_cdf()` method uses the default `.dist_spec` method,
 #'   while `"fixed"` is handled as a point mass by its own method.
 #'
 #' @param ... Additional arguments passed to methods. The default method takes
@@ -56,7 +19,7 @@
 #'   width of each discrete bin).
 #'
 #' @return A vector representing a probability distribution.
-#' @keywords internal
+#' @noRd
 #' @importFrom stats pexp pgamma plnorm pnorm pweibull
 #' @importFrom primarycensored qprimarycensored
 discrete_pmf <- function(x, ...) {
@@ -67,10 +30,10 @@ discrete_pmf <- function(x, ...) {
 discrete_pmf.dist_spec <- function(x, max_value, cdf_max, width, ...) {
   params <- get_parameters(x)
 
-  ## CDF function for the distribution type (a type without a `dist_cdf()`
-  ## method errors via `dist_cdf.default`; the point-mass `fixed` overrides this
-  ## method entirely)
-  cdf <- dist_cdf(x)
+  ## CDF function for the distribution type (a type without a `family_cdf()`
+  ## method errors via `family_cdf.default`; the point-mass `fixed` overrides
+  ## this method entirely)
+  cdf <- family_cdf(x)
 
   ## truncate at the `cdf_max` quantile if one is set (1 = keep everything)
   if (!missing(cdf_max) && cdf_max < 1) {
@@ -119,8 +82,47 @@ discretise <- function(x, ...) {
 }
 #' Discretise a <dist_spec>
 #'
+#' @description
+#' Discretise a <dist_spec>
+#'
+#' # Methodological details
+#'
+#' The probability mass function is computed using the `{primarycensored}`
+#' package, which provides double censored PMF calculations. This correctly
+#' represents the probability mass function of a double censored distribution
+#' arising from the difference of two censored events.
+#'
+#' The probability mass function of the discretised probability distribution is
+#'   a vector where the first entry corresponds to the integral over the (0,1]
+#'   interval of the corresponding continuous distribution (probability of
+#'   integer 0), the second entry corresponds to the (0,2] interval (probability
+#'   mass of integer 1), the third entry corresponds to the (1, 3] interval
+#'   (probability mass of integer 2), etc.
+#'
+#' The maximum value truncates the distribution: mass beyond it is dropped and
+#' the remaining PMF is renormalised to sum to one. A `cdf_max` below `1`
+#' additionally trims the tail, keeping the distribution only up to its
+#' `cdf_max` quantile.
+#'
+#' ## Fixed distributions
+#'
+#' A `Fixed()` (point-mass) distribution is not discretised through a CDF but by
+#' its own method: an integer value places all of the mass on that integer,
+#' while a fractional value splits the mass proportionally across the two
+#' adjacent integers. For example `Fixed(2.25)` places 0.75 on 2 and 0.25 on 3.
+#'
+#' @references
+#' Charniga, K., et al. “Best practices for estimating and reporting
+#'   epidemiological delay distributions of infectious diseases using public
+#'   health surveillance and healthcare data”, *arXiv e-prints*, 2024.
+#'   \doi{10.48550/arXiv.2405.08841}
+#' Park,  S. W.,  et al.,  "Estimating epidemiological delay distributions for
+#'   infectious diseases", *medRxiv*, 2024.
+#'   \doi{https://doi.org/10.1101/2024.01.12.24301247}
+#' Abbott S., et al., "primarycensored: Primary Event Censored Distributions",
+#'   2025. \doi{10.5281/zenodo.13632839}
+#'
 #' @name discretise
-#' @inherit discrete_pmf sections references
 #' @param x A `<dist_spec>`
 #' @param strict Logical; If `TRUE` (default) an error will be thrown if a
 #' distribution cannot be discretised (e.g., because no finite maximum has been

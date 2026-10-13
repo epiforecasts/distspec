@@ -2,7 +2,7 @@
 #
 # Per-type methods for the fixed (point-mass) distribution; see `gamma.R` and
 # issue #64. It discretises to a point mass via its own discrete_pmf method
-# rather than through a CDF, so it has no dist_cdf method.
+# rather than through a CDF, so it has no family_cdf method.
 
 #' Fixed (point-mass) distribution
 #'
