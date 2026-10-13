@@ -480,7 +480,7 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
 #' Log of `F(upper)` for a `max`/`cdf_max` bound
 #'
 #' @description
-#' Shared by [quantile_bounded()] and [cdf_bounded()]: `upper` is the smaller
+#' Shared by `quantile_bounded()` and `cdf_bounded()`: `upper` is the smaller
 #' of `max` and the `cdf_max` quantile. This returns `log F(upper)`, computed
 #' on the log scale throughout, so a bound deep in the tail (where
 #' `F(upper)` underflows to zero in double precision) still gives the
@@ -491,7 +491,7 @@ sample_bounded <- function(x, n, rng, cdf, quantile) {
 #' @param cdf The family's CDF function, as returned by `family_cdf(x)`.
 #' @return A single numeric value, `log F(upper)`.
 #' @importFrom rlang `%||%`
-#' @keywords internal
+#' @noRd
 log_upper_bound <- function(x, params, cdf) {
   log_upper <- log(attr(x, "cdf_max") %||% 1)
   max_value <- attr(x, "max") %||% Inf
@@ -511,14 +511,14 @@ log_upper_bound <- function(x, params, cdf) {
 #' unbounded quantile function `family_quantile(x)`. Otherwise it computes the
 #' quantile of the truncated distribution exactly: `F_trunc^{-1}(p) =
 #' F^{-1}(p * F(upper))`, where `upper` is the smaller of `max` and the
-#' `cdf_max` quantile (see [log_upper_bound()]). This mirrors
+#' `cdf_max` quantile (see `log_upper_bound()`). This mirrors
 #' [sample_bounded()], but for a requested probability `p` instead of a
 #' uniform draw.
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param probs Numeric vector of probabilities in `[0, 1]`.
 #' @return A numeric vector of quantiles, the same length as `probs`.
-#' @keywords internal
+#' @noRd
 quantile_bounded <- function(x, probs) {
   params <- get_parameters(x)
   quantile_fn <- family_quantile(x)
@@ -536,12 +536,12 @@ quantile_bounded <- function(x, probs) {
 #' Used by [cdf.dist_spec()]. If `x` is unconstrained this just calls the
 #' unbounded CDF `family_cdf(x)`. Otherwise it computes the CDF of the truncated
 #' distribution: `F_trunc(q) = F(q) / F(upper)`, capped at `1` for `q` at or
-#' beyond `upper` (see [log_upper_bound()]).
+#' beyond `upper` (see `log_upper_bound()`).
 #'
 #' @param x A single (non-composite) `<dist_spec>` with fixed parameters.
 #' @param q Numeric vector of values to evaluate the CDF at.
 #' @return A numeric vector, the same length as `q`.
-#' @keywords internal
+#' @noRd
 cdf_bounded <- function(x, q) {
   params <- get_parameters(x)
   cdf <- family_cdf(x)
