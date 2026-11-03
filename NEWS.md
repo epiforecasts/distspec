@@ -2,7 +2,7 @@
 
 ## Deprecations
 
-- `dist_cdf()` and `dist_quantile()` are deprecated. They return the unbounded base-R function and ignore any `max`/`cdf_max` bound, so they give the wrong answer for a distribution truncated with `bound_dist()`. Use `cdf()` and `quantile()`, which respect the bound.
+- `dist_cdf()` and `dist_quantile()` are deprecated. They ignore any `max`/`cdf_max` bound set with `bound_dist()` and return the unbounded base-R function, the wrong one for a truncated distribution. `cdf()` and `quantile()` respect the bound and replace them.
 
 # distspec 0.3.0
 
