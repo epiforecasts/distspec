@@ -4,7 +4,7 @@
 # contract: `lower_bounds()` and `mean()`. Registering `natural_params.<type>()`
 # without these fails the test, so a half-added distribution is caught in CI.
 #
-# The conditional generics (`to_natural`, `sd`, `sample_dist`, `dist_cdf`) are
+# The conditional generics (`to_natural`, `sd`, `sample_dist`, `family_cdf`) are
 # deliberately not enforced here: they are defined only when a distribution
 # supports the matching capability (see `vignettes/adding-a-distribution.Rmd`).
 

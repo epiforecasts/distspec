@@ -4,7 +4,7 @@
 # function (stored in `x$pmf`) rather than by parameters. Its summary statistics
 # are computed from the PMF over the support 0, 1, 2, .... It has no
 # `natural_params()`/`lower_bounds()` (it is not an estimated parametric family)
-# and no `dist_cdf()` (it is already discretised). See `gamma.R` and #64.
+# and no `family_cdf()` (it is already discretised). See `gamma.R` and #64.
 
 #' Nonparametric distribution
 #'

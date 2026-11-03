@@ -2,9 +2,12 @@
 % Please edit documentation in R/distribution.R
 \name{dist_cdf}
 \alias{dist_cdf}
-\title{Get a distribution's cumulative distribution function}
+\alias{dist_quantile}
+\title{Get a distribution's CDF or quantile function}
 \usage{
 dist_cdf(x)
+
+dist_quantile(x)
 }
 \arguments{
 \item{x}{A \verb{<dist_spec>}.}
@@ -13,11 +16,10 @@ dist_cdf(x)
 A function.
 }
 \description{
-Returns the distribution's CDF as a base-R \verb{p*} function (e.g. \code{pgamma}),
-ready to call with its own parameters. Used to discretise a distribution
-via \code{{primarycensored}}.
-}
-\examples{
-dist_cdf(Gamma(shape = 1, rate = 1))
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+\code{dist_cdf()} and \code{dist_quantile()} are deprecated because they ignore any
+\code{max}/\code{cdf_max} bound set with \code{\link[=bound_dist]{bound_dist()}}. Use \code{\link[=cdf]{cdf()}} and
+\link[=quantile.dist_spec]{quantile()} instead, which respect the bound.
 }
 \keyword{internal}

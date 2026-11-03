@@ -37,10 +37,10 @@ lower_bounds.gamma <- function(x) {
 }
 
 #' @exportS3Method
-dist_cdf.gamma <- function(x) pgamma
+family_cdf.gamma <- function(x) pgamma
 
 #' @exportS3Method
-dist_quantile.gamma <- function(x) qgamma
+family_quantile.gamma <- function(x) qgamma
 
 #' @exportS3Method
 to_natural.gamma <- function(x, ux) {

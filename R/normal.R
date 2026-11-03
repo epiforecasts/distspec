@@ -30,10 +30,10 @@ lower_bounds.normal <- function(x) {
 }
 
 #' @exportS3Method
-dist_cdf.normal <- function(x) pnorm
+family_cdf.normal <- function(x) pnorm
 
 #' @exportS3Method
-dist_quantile.normal <- function(x) qnorm
+family_quantile.normal <- function(x) qnorm
 
 #' @exportS3Method
 to_natural.normal <- function(x, ux) {
